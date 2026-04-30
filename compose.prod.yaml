@@ -1,0 +1,44 @@
+# Production-specific overrides.
+# Usage: docker compose -f compose.yaml -f compose.prod.yaml up -d --build
+#
+# Add prod-only environment variables, resource limits, or logging config here.
+
+services:
+  api:
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+
+  worker:
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+  scheduler:
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 128M
+
+  web:
+    environment:
+      NODE_ENV: production
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M

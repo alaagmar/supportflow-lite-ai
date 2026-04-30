@@ -1,0 +1,13 @@
+{
+    email you@example.com
+}
+
+# Next.js dashboard
+supportflow.yourdomain.com {
+    reverse_proxy web:3000
+}
+
+# Laravel API
+api.supportflow.yourdomain.com {
+    reverse_proxy api-nginx:80
+}

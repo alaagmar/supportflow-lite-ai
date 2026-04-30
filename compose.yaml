@@ -1,0 +1,159 @@
+name: supportflow-lite-ai
+
+services:
+  postgres:
+    image: ${POSTGRES_IMAGE}
+    container_name: supportflow-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: supportflow
+      POSTGRES_USER: supportflow
+      POSTGRES_PASSWORD: supportflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - private
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U supportflow -d supportflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: ${REDIS_IMAGE}
+    container_name: supportflow-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    networks:
+      - private
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: infra/docker/api/Dockerfile.prod
+      args:
+        PHP_IMAGE: ${PHP_IMAGE}
+        COMPOSER_IMAGE: ${COMPOSER_IMAGE}
+    container_name: supportflow-api
+    restart: unless-stopped
+    env_file:
+      - apps/api/.env
+    volumes:
+      - api_storage:/var/www/html/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - private
+
+  api-nginx:
+    image: ${NGINX_IMAGE}
+    container_name: supportflow-api-nginx
+    restart: unless-stopped
+    volumes:
+      - ./infra/nginx/api.prod.conf:/etc/nginx/conf.d/default.conf:ro
+      - api_public:/var/www/html/public:ro
+    depends_on:
+      - api
+    networks:
+      - private
+      - public
+
+  worker:
+    build:
+      context: .
+      dockerfile: infra/docker/api/Dockerfile.prod
+      args:
+        PHP_IMAGE: ${PHP_IMAGE}
+        COMPOSER_IMAGE: ${COMPOSER_IMAGE}
+    container_name: supportflow-worker
+    restart: unless-stopped
+    command: php artisan queue:work redis --sleep=3 --tries=3 --timeout=180
+    env_file:
+      - apps/api/.env
+    volumes:
+      - api_storage:/var/www/html/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - private
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: infra/docker/api/Dockerfile.prod
+      args:
+        PHP_IMAGE: ${PHP_IMAGE}
+        COMPOSER_IMAGE: ${COMPOSER_IMAGE}
+    container_name: supportflow-scheduler
+    restart: unless-stopped
+    command: sh -c "while true; do php artisan schedule:run --verbose --no-interaction; sleep 60; done"
+    env_file:
+      - apps/api/.env
+    volumes:
+      - api_storage:/var/www/html/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - private
+
+  web:
+    build:
+      context: .
+      dockerfile: infra/docker/web/Dockerfile.prod
+      args:
+        NODE_IMAGE: ${NODE_IMAGE}
+    container_name: supportflow-web
+    restart: unless-stopped
+    env_file:
+      - apps/web/.env
+    depends_on:
+      - api-nginx
+    networks:
+      - public
+      - private
+
+  caddy:
+    image: ${CADDY_IMAGE}
+    container_name: supportflow-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./infra/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+      - api-nginx
+    networks:
+      - public
+
+networks:
+  public:
+  private:
+    internal: true
+
+volumes:
+  postgres_data:
+  redis_data:
+  api_storage:
+  api_public:
+  caddy_data:
+  caddy_config:

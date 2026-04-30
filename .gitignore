@@ -1,0 +1,26 @@
+.env
+.env.development
+.env.production
+
+# App directories (not yet scaffolded)
+apps/api/vendor/
+apps/api/node_modules/
+apps/web/node_modules/
+apps/web/.next/
+
+# Docker volumes
+postgres_data/
+redis_data/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
