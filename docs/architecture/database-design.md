@@ -18,6 +18,8 @@ Every tenant-owned record has `workspace_id`.
 - `ai_runs` — id, workspace_id, ticket_id, provider, model, task_type, status, input_json, output_json, error_message, latency_ms, confidence, prompt_version, started_at, completed_at
 - `ticket_ai_outputs` — id, workspace_id, ticket_id, classification_run_id, draft_run_id, summary, category, urgency, sentiment, language, draft_reply, recommended_action, requires_human_approval, confidence, evidence_json
 
+**Implemented:** `ai_runs` and `ticket_ai_outputs` tables exist with migrations and Eloquent models.
+
 ### Policies
 - `policy_documents` — id, workspace_id, title, type, status, original_filename, content_text, uploaded_by
 - `policy_chunks` — id, workspace_id, policy_document_id, chunk_index, content, keywords

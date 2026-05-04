@@ -23,13 +23,12 @@ SupportFlow Lite AI is a portfolio-grade system built to demonstrate:
 
 Implemented now:
 
-- `apps/api` — role-prefixed auth/session APIs (`owner`, `admin`, `staff`), workspace membership APIs, and workspace-scoped ticket APIs (list/create/show/update/status/delete) with policies, requests, resources, and feature tests.
-- `apps/web` — owner/admin/staff login flows, workspace dashboards, and role-aware ticket queue/detail pages with ticket creation and status updates.
+- `apps/api` — role-prefixed auth/session APIs (`owner`, `admin`, `staff`), workspace membership APIs, workspace-scoped ticket APIs (list/create/show/update/status/delete), and AI processing pipeline with queued jobs, provider interface, and mock fallback.
+- `apps/web` — owner/admin/staff login flows, workspace dashboards, role-aware ticket queue/detail pages, and AI review UI with classification results and draft reply approval.
 - `infra` — Docker-first dev/prod runtime for API, worker, scheduler, web, PostgreSQL, Redis, Caddy, and Mailpit.
 
 Still pending:
 
-- AI pipeline implementation (jobs, provider layer, `ai_runs`, `ticket_ai_outputs`).
 - Policy knowledge base (`policy_documents`, `policy_chunks`).
 - Audit/analytics, billing mock, and team invitation/member management modules.
 

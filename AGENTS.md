@@ -9,7 +9,7 @@ The repository is a Docker-first monorepo:
 - Backend: Laravel 12 API in `apps/api`, Sanctum installed, API routing enabled, PostgreSQL/Redis/Mailpit env defaults.
 - Frontend: Next.js 15 App Router in `apps/web`, TypeScript, Tailwind CSS 4, ESLint, standalone output for Docker production builds.
 - Infrastructure: Docker Compose, PHP-FPM, Nginx, Caddy, PostgreSQL 18, Redis 8, Mailpit, scripts in `infra/`.
-- Current state: Identity, Workspace, and Ticket foundations are implemented with role-prefixed auth/workspace/ticket APIs, workspace membership roles, owner/admin/staff frontend ticket entry points, and backend feature tests. AI provider layer, policy knowledge base, review evidence workflows, audit/analytics, billing mock, and team invitation/member management are still pending.
+- Current state: Identity, Workspace, and Ticket foundations are implemented with role-prefixed auth/workspace/ticket APIs, workspace membership roles, owner/admin/staff frontend ticket entry points, and backend feature tests. AI processing pipeline with queued jobs, provider abstraction, mock fallback, and frontend review UI are implemented. Policy knowledge base, audit/analytics, billing mock, and team invitation/member management are still pending.
 
 All development and production workflows are Docker-based. Do not run Composer, npm, Artisan, Next.js, queue workers, or tests directly on the host.
 

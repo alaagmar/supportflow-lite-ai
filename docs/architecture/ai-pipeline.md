@@ -61,6 +61,8 @@ interface AiProviderInterface
 
 Implementations: `MistralAiProvider`, `MockAiProvider`
 
+**Implemented:** `AiProvider` contract and `MockAiProvider` are implemented in `app/Domain/AiProcessing/`. The queued `ProcessTicketAiJob` dispatches AI work asynchronously.
+
 ## JSON Validation
 
 Every Mistral response is validated against the expected schema before saving.
