@@ -40,9 +40,15 @@ export default function Home() {
                 </Link>
                 <Link
                   className="rounded-2xl border border-white/10 bg-white/[0.06] px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-white/[0.1]"
+                  href="/admin/login"
+                >
+                  Admin login
+                </Link>
+                <Link
+                  className="rounded-2xl border border-white/10 bg-white/[0.06] px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-white/[0.1]"
                   href="/staff/login"
                 >
-                  Admin and agent login
+                  Staff login
                 </Link>
               </div>
             </div>

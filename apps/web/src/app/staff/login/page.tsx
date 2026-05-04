@@ -4,8 +4,8 @@ import { PortalLoginForm } from "@/components/auth/portal-login-form";
 export default function StaffLoginPage() {
   return (
     <AuthShell
-      description="Admins and agents share a focused staff entry point. Laravel checks workspace membership before granting access."
-      eyebrow="Admin and agent portal"
+      description="Agents and viewers can use the staff portal for ticket execution while Laravel enforces workspace role access."
+      eyebrow="Staff portal"
       title="Enter the operational console for ticket triage."
     >
       <div className="mx-auto max-w-md">

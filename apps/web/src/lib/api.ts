@@ -1,5 +1,7 @@
 export type WorkspaceRole = "owner" | "admin" | "agent" | "viewer";
 
+export type PortalSlug = "owner" | "admin" | "staff";
+
 export type ApiUser = {
   id: number;
   name: string;
@@ -21,7 +23,7 @@ export type AuthSessionPayload = {
   data: {
     token: string;
     token_type: "Bearer";
-    portal: "owner" | "admin" | "staff";
+    portal: PortalSlug;
     user: ApiUser;
     workspaces: ApiWorkspace[];
   };
@@ -44,14 +46,17 @@ export type WorkspacePayload = {
   data: ApiWorkspace;
 };
 
-export type TicketStatus =
-  | "new"
-  | "processing"
-  | "needs_review"
-  | "approved"
-  | "rejected"
-  | "resolved"
-  | "failed";
+export const TICKET_STATUSES = [
+  "new",
+  "processing",
+  "needs_review",
+  "approved",
+  "rejected",
+  "resolved",
+  "failed",
+] as const;
+
+export type TicketStatus = (typeof TICKET_STATUSES)[number];
 
 export type ApiTicket = {
   id: number;
