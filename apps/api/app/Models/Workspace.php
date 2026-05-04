@@ -55,4 +55,12 @@ class Workspace extends Model
             ->withPivot('role')
             ->withTimestamps();
     }
+
+    /**
+     * @return HasMany<Ticket, $this>
+     */
+    public function tickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class);
+    }
 }

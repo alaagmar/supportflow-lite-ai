@@ -44,6 +44,44 @@ export type WorkspacePayload = {
   data: ApiWorkspace;
 };
 
+export type TicketStatus =
+  | "new"
+  | "processing"
+  | "needs_review"
+  | "approved"
+  | "rejected"
+  | "resolved"
+  | "failed";
+
+export type ApiTicket = {
+  id: number;
+  workspace_id: number;
+  customer_name: string;
+  customer_email: string;
+  subject: string;
+  body: string;
+  status: TicketStatus;
+  category?: string | null;
+  urgency?: string | null;
+  sentiment?: string | null;
+  language?: string | null;
+  confidence?: string | null;
+  assigned_to?: number | null;
+  created_by?: number | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type TicketListPayload = {
+  data: ApiTicket[];
+  links?: Record<string, string | null>;
+  meta?: Record<string, unknown>;
+};
+
+export type TicketPayload = {
+  data: ApiTicket;
+};
+
 export type ApiValidationErrors = Record<string, string[]>;
 
 type ApiErrorPayload = {

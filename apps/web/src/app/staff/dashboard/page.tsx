@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { logoutAction } from "@/app/actions";
 import { apiRequest, ApiRequestError, type CurrentSessionPayload } from "@/lib/api";
 import { getAuthToken } from "@/lib/session";
@@ -69,11 +70,17 @@ export default async function StaffDashboardPage() {
                         {workspace.role}
                       </span>
                     </div>
+                    <Link
+                      className="mt-3 inline-flex rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:border-cyan-300/30 hover:bg-cyan-300/10"
+                      href={`/staff/workspaces/${workspace.id}/tickets`}
+                    >
+                      Open ticket queue
+                    </Link>
                   </div>
                 ))
               ) : (
                 <p className="rounded-2xl border border-dashed border-white/10 bg-slate-950/50 p-4 text-sm leading-6 text-slate-400">
-                  This account has no admin or agent memberships.
+                  This account has no staff workspace memberships.
                 </p>
               )}
             </div>

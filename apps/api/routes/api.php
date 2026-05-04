@@ -3,8 +3,15 @@
 use App\Http\Controllers\Admin\Auth\CurrentSessionController as AdminCurrentSessionController;
 use App\Http\Controllers\Admin\Auth\LoginController as AdminLoginController;
 use App\Http\Controllers\Admin\Auth\LogoutController as AdminLogoutController;
+use App\Http\Controllers\Portal\Tickets\CreateTicketController;
+use App\Http\Controllers\Portal\Tickets\DeleteTicketController;
+use App\Http\Controllers\Portal\Tickets\ListTicketsController;
+use App\Http\Controllers\Portal\Tickets\ShowTicketController;
+use App\Http\Controllers\Portal\Tickets\UpdateTicketController;
+use App\Http\Controllers\Portal\Tickets\UpdateTicketStatusController;
 use App\Http\Controllers\Admin\Workspaces\ListWorkspacesController as AdminListWorkspacesController;
 use App\Http\Controllers\Admin\Workspaces\ShowWorkspaceController as AdminShowWorkspaceController;
+use App\Domain\Identity\Portal;
 use App\Http\Controllers\Owner\Auth\CurrentSessionController as OwnerCurrentSessionController;
 use App\Http\Controllers\Owner\Auth\LoginController as OwnerLoginController;
 use App\Http\Controllers\Owner\Auth\LogoutController as OwnerLogoutController;
@@ -19,40 +26,82 @@ use App\Http\Controllers\Staff\Workspaces\ListWorkspacesController as StaffListW
 use App\Http\Controllers\Staff\Workspaces\ShowWorkspaceController as StaffShowWorkspaceController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('owner')->group(function (): void {
+$registerPortalTicketRoutes = static function (string $portal, string $portalAbility): void {
+    Route::get('/workspaces/{workspace}/tickets', ListTicketsController::class)
+        ->whereNumber('workspace')
+        ->defaults('portal', $portal)
+        ->defaults('portal_ability', $portalAbility);
+
+    Route::post('/workspaces/{workspace}/tickets', CreateTicketController::class)
+        ->whereNumber('workspace')
+        ->defaults('portal', $portal)
+        ->defaults('portal_ability', $portalAbility);
+
+    Route::get('/workspaces/{workspace}/tickets/{ticket}', ShowTicketController::class)
+        ->whereNumber('workspace')
+        ->whereNumber('ticket')
+        ->defaults('portal', $portal)
+        ->defaults('portal_ability', $portalAbility);
+
+    Route::patch('/workspaces/{workspace}/tickets/{ticket}', UpdateTicketController::class)
+        ->whereNumber('workspace')
+        ->whereNumber('ticket')
+        ->defaults('portal', $portal)
+        ->defaults('portal_ability', $portalAbility);
+
+    Route::patch('/workspaces/{workspace}/tickets/{ticket}/status', UpdateTicketStatusController::class)
+        ->whereNumber('workspace')
+        ->whereNumber('ticket')
+        ->defaults('portal', $portal)
+        ->defaults('portal_ability', $portalAbility);
+
+    Route::delete('/workspaces/{workspace}/tickets/{ticket}', DeleteTicketController::class)
+        ->whereNumber('workspace')
+        ->whereNumber('ticket')
+        ->defaults('portal', $portal)
+        ->defaults('portal_ability', $portalAbility);
+};
+
+Route::prefix('owner')->group(function () use ($registerPortalTicketRoutes): void {
     Route::post('/auth/register', OwnerRegisterController::class)->middleware('throttle:auth-register-owner');
     Route::post('/auth/login', OwnerLoginController::class)->middleware('throttle:auth-login');
 
-    Route::middleware('auth:sanctum')->group(function (): void {
+    Route::middleware('auth:sanctum')->group(function () use ($registerPortalTicketRoutes): void {
         Route::get('/auth/me', OwnerCurrentSessionController::class);
         Route::post('/auth/logout', OwnerLogoutController::class);
 
         Route::get('/workspaces', OwnerListWorkspacesController::class);
         Route::post('/workspaces', OwnerCreateWorkspaceController::class);
         Route::get('/workspaces/{workspace}', OwnerShowWorkspaceController::class)->whereNumber('workspace');
+
+        $registerPortalTicketRoutes(Portal::OWNER, 'accessOwnerPortal');
     });
 });
 
-Route::prefix('admin')->group(function (): void {
+Route::prefix('admin')->group(function () use ($registerPortalTicketRoutes): void {
     Route::post('/auth/login', AdminLoginController::class)->middleware('throttle:auth-login');
 
-    Route::middleware('auth:sanctum')->group(function (): void {
+    Route::middleware('auth:sanctum')->group(function () use ($registerPortalTicketRoutes): void {
         Route::get('/auth/me', AdminCurrentSessionController::class);
         Route::post('/auth/logout', AdminLogoutController::class);
 
         Route::get('/workspaces', AdminListWorkspacesController::class);
         Route::get('/workspaces/{workspace}', AdminShowWorkspaceController::class)->whereNumber('workspace');
+
+        $registerPortalTicketRoutes(Portal::ADMIN, 'accessAdminPortal');
     });
 });
 
-Route::prefix('staff')->group(function (): void {
+Route::prefix('staff')->group(function () use ($registerPortalTicketRoutes): void {
     Route::post('/auth/login', StaffLoginController::class)->middleware('throttle:auth-login');
 
-    Route::middleware('auth:sanctum')->group(function (): void {
+    Route::middleware('auth:sanctum')->group(function () use ($registerPortalTicketRoutes): void {
         Route::get('/auth/me', StaffCurrentSessionController::class);
         Route::post('/auth/logout', StaffLogoutController::class);
 
         Route::get('/workspaces', StaffListWorkspacesController::class);
         Route::get('/workspaces/{workspace}', StaffShowWorkspaceController::class)->whereNumber('workspace');
+
+        $registerPortalTicketRoutes(Portal::STAFF, 'accessStaffPortal');
     });
 });

@@ -4,9 +4,13 @@ namespace App\Providers;
 
 use App\Domain\Identity\Contracts\UserRepository;
 use App\Domain\Identity\Repositories\EloquentUserRepository;
+use App\Domain\Ticketing\Contracts\TicketRepository;
+use App\Domain\Ticketing\Repositories\EloquentTicketRepository;
 use App\Domain\Workspaces\Contracts\WorkspaceRepository;
 use App\Domain\Workspaces\Repositories\EloquentWorkspaceRepository;
+use App\Models\Ticket;
 use App\Models\Workspace;
+use App\Policies\TicketPolicy;
 use App\Policies\WorkspacePolicy;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -24,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(UserRepository::class, EloquentUserRepository::class);
         $this->app->bind(WorkspaceRepository::class, EloquentWorkspaceRepository::class);
+        $this->app->bind(TicketRepository::class, EloquentTicketRepository::class);
     }
 
     /**
@@ -32,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(Workspace::class, WorkspacePolicy::class);
+        Gate::policy(Ticket::class, TicketPolicy::class);
 
         RateLimiter::for('auth-login', function (Request $request): Limit {
             $email = Str::lower((string) $request->input('email', ''));
