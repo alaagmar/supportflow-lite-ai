@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Domain\Identity\Contracts\UserRepository;
 use App\Domain\Identity\Repositories\EloquentUserRepository;
+use App\Domain\AiProcessing\Contracts\AiProvider;
+use App\Domain\AiProcessing\Providers\MockAiProvider;
 use App\Domain\Ticketing\Contracts\TicketRepository;
 use App\Domain\Ticketing\Repositories\EloquentTicketRepository;
 use App\Domain\Workspaces\Contracts\WorkspaceRepository;
@@ -29,6 +31,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(UserRepository::class, EloquentUserRepository::class);
         $this->app->bind(WorkspaceRepository::class, EloquentWorkspaceRepository::class);
         $this->app->bind(TicketRepository::class, EloquentTicketRepository::class);
+        $this->app->bind(AiProvider::class, MockAiProvider::class);
     }
 
     /**

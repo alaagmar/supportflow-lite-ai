@@ -87,6 +87,82 @@ export type TicketPayload = {
   data: ApiTicket;
 };
 
+export const AI_RUN_STATUSES = [
+  "pending",
+  "running",
+  "completed",
+  "failed",
+  "rate_limited",
+  "fallback_used",
+] as const;
+
+export type AiRunStatus = (typeof AI_RUN_STATUSES)[number];
+
+export const AI_RUN_TASK_TYPES = [
+  "classify_ticket",
+  "draft_reply",
+  "summarize_ticket",
+] as const;
+
+export type AiRunTaskType = (typeof AI_RUN_TASK_TYPES)[number];
+
+export type ApiAiRun = {
+  id: number;
+  workspace_id: number;
+  ticket_id: number;
+  provider: string;
+  model?: string | null;
+  task_type: AiRunTaskType;
+  status: AiRunStatus;
+  error_message?: string | null;
+  latency_ms?: number | null;
+  confidence?: string | null;
+  prompt_version?: string | null;
+  started_at?: string | null;
+  completed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type ApiTicketAiOutput = {
+  id: number;
+  workspace_id: number;
+  ticket_id: number;
+  classification_run_id?: number | null;
+  draft_run_id?: number | null;
+  summary?: string | null;
+  category?: string | null;
+  urgency?: string | null;
+  sentiment?: string | null;
+  language?: string | null;
+  draft_reply?: string | null;
+  recommended_action?: string | null;
+  requires_human_approval: boolean;
+  confidence?: string | null;
+  evidence_json?: Array<Record<string, unknown>> | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type TicketAiReviewPayload = {
+  data: {
+    ticket_id: number;
+    workspace_id: number;
+    ticket_status: TicketStatus;
+    ai_output: ApiTicketAiOutput | null;
+    ai_runs: ApiAiRun[];
+  };
+};
+
+export type TicketAiProcessPayload = {
+  data: {
+    ticket_id: number;
+    workspace_id: number;
+    status: TicketStatus;
+    queued: boolean;
+  };
+};
+
 export type ApiValidationErrors = Record<string, string[]>;
 
 type ApiErrorPayload = {

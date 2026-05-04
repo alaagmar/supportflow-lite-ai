@@ -51,6 +51,16 @@ class TicketPolicy
         return $this->update($user, $ticket);
     }
 
+    public function processAi(User $user, Ticket $ticket): bool
+    {
+        return $this->update($user, $ticket);
+    }
+
+    public function viewAiOutput(User $user, Ticket $ticket): bool
+    {
+        return $this->view($user, $ticket);
+    }
+
     public function delete(User $user, Ticket $ticket): bool
     {
         return $user->workspaceMemberships()

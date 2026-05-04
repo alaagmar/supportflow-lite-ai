@@ -6,12 +6,14 @@ type SubmitButtonProps = {
   children: React.ReactNode;
   pendingLabel?: string;
   variant?: "primary" | "secondary";
+  disabled?: boolean;
 };
 
 export function SubmitButton({
   children,
   pendingLabel = "Working...",
   variant = "primary",
+  disabled = false,
 }: SubmitButtonProps) {
   const { pending } = useFormStatus();
   const classes =
@@ -22,7 +24,7 @@ export function SubmitButton({
   return (
     <button
       className={`inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 text-sm font-semibold shadow-xl transition disabled:cursor-not-allowed disabled:opacity-60 ${classes}`}
-      disabled={pending}
+      disabled={pending || disabled}
       type="submit"
     >
       {pending ? pendingLabel : children}

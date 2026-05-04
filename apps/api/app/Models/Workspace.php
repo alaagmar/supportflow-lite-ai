@@ -63,4 +63,20 @@ class Workspace extends Model
     {
         return $this->hasMany(Ticket::class);
     }
+
+    /**
+     * @return HasMany<AiRun, $this>
+     */
+    public function aiRuns(): HasMany
+    {
+        return $this->hasMany(AiRun::class);
+    }
+
+    /**
+     * @return HasMany<TicketAiOutput, $this>
+     */
+    public function ticketAiOutputs(): HasMany
+    {
+        return $this->hasMany(TicketAiOutput::class);
+    }
 }

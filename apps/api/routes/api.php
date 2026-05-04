@@ -6,7 +6,9 @@ use App\Http\Controllers\Admin\Auth\LogoutController as AdminLogoutController;
 use App\Http\Controllers\Portal\Tickets\CreateTicketController;
 use App\Http\Controllers\Portal\Tickets\DeleteTicketController;
 use App\Http\Controllers\Portal\Tickets\ListTicketsController;
+use App\Http\Controllers\Portal\Tickets\ProcessTicketAiController;
 use App\Http\Controllers\Portal\Tickets\ShowTicketController;
+use App\Http\Controllers\Portal\Tickets\ShowTicketAiOutputController;
 use App\Http\Controllers\Portal\Tickets\UpdateTicketController;
 use App\Http\Controllers\Portal\Tickets\UpdateTicketStatusController;
 use App\Http\Controllers\Admin\Workspaces\ListWorkspacesController as AdminListWorkspacesController;
@@ -50,6 +52,18 @@ $registerPortalTicketRoutes = static function (string $portal, string $portalAbi
         ->defaults('portal_ability', $portalAbility);
 
     Route::patch('/workspaces/{workspace}/tickets/{ticket}/status', UpdateTicketStatusController::class)
+        ->whereNumber('workspace')
+        ->whereNumber('ticket')
+        ->defaults('portal', $portal)
+        ->defaults('portal_ability', $portalAbility);
+
+    Route::post('/workspaces/{workspace}/tickets/{ticket}/ai/process', ProcessTicketAiController::class)
+        ->whereNumber('workspace')
+        ->whereNumber('ticket')
+        ->defaults('portal', $portal)
+        ->defaults('portal_ability', $portalAbility);
+
+    Route::get('/workspaces/{workspace}/tickets/{ticket}/ai-output', ShowTicketAiOutputController::class)
         ->whereNumber('workspace')
         ->whereNumber('ticket')
         ->defaults('portal', $portal)

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Ticket extends Model
 {
@@ -101,5 +102,21 @@ class Ticket extends Model
     public function messages(): HasMany
     {
         return $this->hasMany(TicketMessage::class);
+    }
+
+    /**
+     * @return HasMany<AiRun, $this>
+     */
+    public function aiRuns(): HasMany
+    {
+        return $this->hasMany(AiRun::class);
+    }
+
+    /**
+     * @return HasOne<TicketAiOutput, $this>
+     */
+    public function aiOutput(): HasOne
+    {
+        return $this->hasOne(TicketAiOutput::class);
     }
 }

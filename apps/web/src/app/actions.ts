@@ -7,6 +7,7 @@ import {
   ApiRequestError,
   type AuthSessionPayload,
   type PortalSlug,
+  type TicketAiProcessPayload,
   TICKET_STATUSES,
   type TicketPayload,
   type TicketStatus,
@@ -181,6 +182,50 @@ export async function updatePortalTicketStatusAction(
   revalidatePath(`/${portal}/workspaces/${workspaceId}/tickets/${ticketId}`);
 
   return { message: `Ticket status updated to ${formatStatusLabel(status)}.` };
+}
+
+export async function processPortalTicketAiAction(
+  _state: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const portal = portalFromFormData(formData);
+  const token = await getAuthToken();
+
+  if (!token) {
+    redirect(PORTAL_LOGIN_PATH[portal]);
+  }
+
+  const workspaceId = positiveIntegerFromFormData(formData, "workspace_id");
+  const ticketId = positiveIntegerFromFormData(formData, "ticket_id");
+
+  if (!workspaceId || !ticketId) {
+    return {
+      message: "Unable to run AI because the ticket context is invalid.",
+    };
+  }
+
+  let response: TicketAiProcessPayload;
+
+  try {
+    response = await apiRequest<TicketAiProcessPayload>(
+      `/api/${portal}/workspaces/${workspaceId}/tickets/${ticketId}/ai/process`,
+      {
+        method: "POST",
+        token,
+      },
+    );
+  } catch (error) {
+    return formError(error);
+  }
+
+  revalidatePath(`/${portal}/workspaces/${workspaceId}/tickets`);
+  revalidatePath(`/${portal}/workspaces/${workspaceId}/tickets/${ticketId}`);
+
+  return {
+    message: response.data.queued
+      ? "AI processing has been queued for this ticket."
+      : "AI output is already in progress or ready to review.",
+  };
 }
 
 export async function logoutAction(): Promise<void> {

@@ -2,12 +2,14 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { logoutAction } from "@/app/actions";
 import { PortalTicketCreateForm } from "@/components/tickets/portal-ticket-create-form";
+import { TicketAiProcessForm } from "@/components/tickets/ticket-ai-process-form";
 import { TicketStatusForm } from "@/components/tickets/ticket-status-form";
 import {
   apiRequest,
   ApiRequestError,
   type CurrentSessionPayload,
   type PortalSlug,
+  type TicketAiReviewPayload,
   type TicketListPayload,
   type TicketPayload,
   type TicketStatus,
@@ -42,6 +44,15 @@ const statusTone: Record<TicketStatus, string> = {
   rejected: "border-rose-300/30 bg-rose-300/10 text-rose-100",
   resolved: "border-cyan-300/30 bg-cyan-300/10 text-cyan-100",
   failed: "border-red-300/30 bg-red-300/10 text-red-100",
+};
+
+const aiRunStatusTone: Record<string, string> = {
+  pending: "border-slate-300/20 bg-slate-300/10 text-slate-100",
+  running: "border-amber-300/30 bg-amber-300/10 text-amber-100",
+  completed: "border-emerald-300/30 bg-emerald-300/10 text-emerald-100",
+  failed: "border-rose-300/30 bg-rose-300/10 text-rose-100",
+  rate_limited: "border-orange-300/30 bg-orange-300/10 text-orange-100",
+  fallback_used: "border-cyan-300/30 bg-cyan-300/10 text-cyan-100",
 };
 
 const portalView: Record<PortalSlug, {
@@ -267,7 +278,32 @@ export async function PortalTicketDetailPage({ portal, params }: PortalTicketDet
     throw error;
   }
 
+  let aiReview: TicketAiReviewPayload;
+
+  try {
+    aiReview = await apiRequest<TicketAiReviewPayload>(
+      `/api/${portal}/workspaces/${workspaceId}/tickets/${ticketId}/ai-output`,
+      {
+        token,
+      },
+    );
+  } catch (error) {
+    if (error instanceof ApiRequestError) {
+      if (error.status === 401) {
+        redirect(view.loginPath);
+      }
+
+      if (error.status === 404) {
+        notFound();
+      }
+    }
+
+    throw error;
+  }
+
   const ticket = ticketResponse.data;
+  const aiOutput = aiReview.data.ai_output;
+  const aiRuns = aiReview.data.ai_runs;
   const canManageTicket = workspace.role !== "viewer";
 
   return (
@@ -324,8 +360,101 @@ export async function PortalTicketDetailPage({ portal, params }: PortalTicketDet
             <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-200">{ticket.body}</p>
           </article>
 
-          {canManageTicket ? (
+          <section className="mt-5 rounded-2xl border border-white/10 bg-slate-950/70 p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold text-white">AI review output</h2>
+                <p className="mt-2 text-sm text-slate-400">
+                  Classification and draft suggestions for human review before customer response.
+                </p>
+              </div>
+              <span
+                className={`rounded-full border px-3 py-1 text-xs font-medium ${statusTone[aiReview.data.ticket_status]}`}
+              >
+                {formatLabel(aiReview.data.ticket_status)}
+              </span>
+            </div>
+
+            {aiOutput ? (
+              <div className="mt-5 space-y-5">
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  <AiMetricCard label="Category" value={aiOutput.category} />
+                  <AiMetricCard label="Urgency" value={aiOutput.urgency} />
+                  <AiMetricCard label="Sentiment" value={aiOutput.sentiment} />
+                  <AiMetricCard label="Language" value={aiOutput.language} />
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4">
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Summary</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-200">{aiOutput.summary ?? "No summary available."}</p>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4">
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Draft reply</p>
+                  <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-200">
+                    {aiOutput.draft_reply ?? "No draft reply generated yet."}
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4">
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Recommended action</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-200">
+                    {aiOutput.recommended_action ?? "No recommendation available."}
+                  </p>
+                  <p className="mt-3 text-xs text-slate-400">
+                    Human approval required: {aiOutput.requires_human_approval ? "Yes" : "No"}
+                    {aiOutput.confidence ? ` · Confidence ${aiOutput.confidence}` : ""}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <p className="mt-5 rounded-2xl border border-dashed border-white/10 bg-slate-950/50 p-4 text-sm text-slate-400">
+                No AI output has been generated for this ticket yet.
+              </p>
+            )}
+
             <div className="mt-5">
+              <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Recent AI runs</h3>
+              {aiRuns.length > 0 ? (
+                <div className="mt-3 space-y-3">
+                  {aiRuns.map((run) => (
+                    <article className="rounded-2xl border border-white/10 bg-slate-900/60 p-4" key={run.id}>
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <p className="text-sm font-semibold text-white">{formatLabel(run.task_type)}</p>
+                        <span
+                          className={`rounded-full border px-3 py-1 text-xs font-medium ${aiRunStatusTone[run.status] ?? aiRunStatusTone.pending}`}
+                        >
+                          {formatLabel(run.status)}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-xs text-slate-400">
+                        {run.provider}
+                        {run.model ? ` · ${run.model}` : ""}
+                        {run.latency_ms ? ` · ${run.latency_ms} ms` : ""}
+                        {run.confidence ? ` · confidence ${run.confidence}` : ""}
+                      </p>
+                      {run.error_message ? (
+                        <p className="mt-2 text-xs text-rose-200">{run.error_message}</p>
+                      ) : null}
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-3 rounded-2xl border border-dashed border-white/10 bg-slate-950/50 p-4 text-sm text-slate-400">
+                  No AI runs have been recorded for this ticket yet.
+                </p>
+              )}
+            </div>
+          </section>
+
+          {canManageTicket ? (
+            <div className="mt-5 grid gap-5 lg:grid-cols-2">
+              <TicketAiProcessForm
+                portal={portal}
+                ticketId={ticket.id}
+                ticketStatus={ticket.status}
+                workspaceId={workspaceId}
+              />
               <TicketStatusForm
                 currentStatus={ticket.status}
                 portal={portal}
@@ -335,11 +464,27 @@ export async function PortalTicketDetailPage({ portal, params }: PortalTicketDet
             </div>
           ) : (
             <p className="mt-5 rounded-2xl border border-dashed border-white/10 bg-slate-950/50 p-4 text-sm text-slate-400">
-              Viewer role can inspect ticket details but cannot change ticket status.
+              Viewer role can inspect ticket details and AI output, but cannot run AI processing or change status.
             </p>
           )}
         </section>
       </div>
     </main>
+  );
+}
+
+function formatLabel(value: string): string {
+  return value
+    .split("_")
+    .map((segment) => segment[0].toUpperCase() + segment.slice(1))
+    .join(" ");
+}
+
+function AiMetricCard({ label, value }: { label: string; value?: string | null }) {
+  return (
+    <article className="rounded-2xl border border-white/10 bg-slate-900/60 p-4">
+      <p className="text-xs uppercase tracking-[0.2em] text-slate-500">{label}</p>
+      <p className="mt-2 text-sm font-medium text-white">{value ? formatLabel(value) : "N/A"}</p>
+    </article>
   );
 }
