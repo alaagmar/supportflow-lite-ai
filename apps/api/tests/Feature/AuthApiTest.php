@@ -74,12 +74,15 @@ class AuthApiTest extends TestCase
 
     public function test_owner_login_requires_owner_membership(): void
     {
+        $ownerEmail = 'owner-'.Str::lower(Str::random(8)).'@example.com';
+        $agentEmail = 'agent-'.Str::lower(Str::random(8)).'@example.com';
+
         $owner = User::factory()->create([
-            'email' => 'owner@example.com',
+            'email' => $ownerEmail,
             'password' => 'password-secret',
         ]);
         $agent = User::factory()->create([
-            'email' => 'agent@example.com',
+            'email' => $agentEmail,
             'password' => 'password-secret',
         ]);
 
@@ -87,7 +90,7 @@ class AuthApiTest extends TestCase
         WorkspaceMember::factory()->agent()->create(['user_id' => $agent->id]);
 
         $this->postJson('/api/owner/auth/login', [
-            'email' => 'owner@example.com',
+            'email' => $ownerEmail,
             'password' => 'password-secret',
         ])
             ->assertOk()
@@ -96,7 +99,7 @@ class AuthApiTest extends TestCase
             ->assertJsonStructure(['data' => ['token']]);
 
         $this->postJson('/api/owner/auth/login', [
-            'email' => 'agent@example.com',
+            'email' => $agentEmail,
             'password' => 'password-secret',
         ])->assertForbidden();
     }
@@ -162,15 +165,17 @@ class AuthApiTest extends TestCase
 
     public function test_login_rejects_invalid_credentials(): void
     {
+        $email = 'owner-'.Str::lower(Str::random(8)).'@example.com';
+
         $user = User::factory()->create([
-            'email' => 'owner@example.com',
+            'email' => $email,
             'password' => 'password-secret',
         ]);
 
         WorkspaceMember::factory()->owner()->create(['user_id' => $user->id]);
 
         $this->postJson('/api/owner/auth/login', [
-            'email' => 'owner@example.com',
+            'email' => $email,
             'password' => 'wrong-password',
         ])
             ->assertUnprocessable()

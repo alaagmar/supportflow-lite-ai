@@ -18,7 +18,9 @@ type PortalTicketListPageProps = {
   portal: PortalSlug;
   params: {
     workspaceId: string;
-  };
+  } | Promise<{
+    workspaceId: string;
+  }>;
 };
 
 type PortalTicketDetailPageProps = {
@@ -26,7 +28,10 @@ type PortalTicketDetailPageProps = {
   params: {
     workspaceId: string;
     ticketId: string;
-  };
+  } | Promise<{
+    workspaceId: string;
+    ticketId: string;
+  }>;
 };
 
 const statusTone: Record<TicketStatus, string> = {
@@ -73,7 +78,8 @@ export async function PortalTicketListPage({ portal, params }: PortalTicketListP
     redirect(view.loginPath);
   }
 
-  const workspaceId = Number.parseInt(params.workspaceId, 10);
+  const resolvedParams = await params;
+  const workspaceId = Number.parseInt(resolvedParams.workspaceId, 10);
 
   if (!Number.isInteger(workspaceId) || workspaceId <= 0) {
     notFound();
@@ -215,8 +221,9 @@ export async function PortalTicketDetailPage({ portal, params }: PortalTicketDet
     redirect(view.loginPath);
   }
 
-  const workspaceId = Number.parseInt(params.workspaceId, 10);
-  const ticketId = Number.parseInt(params.ticketId, 10);
+  const resolvedParams = await params;
+  const workspaceId = Number.parseInt(resolvedParams.workspaceId, 10);
+  const ticketId = Number.parseInt(resolvedParams.ticketId, 10);
 
   if (!Number.isInteger(workspaceId) || workspaceId <= 0 || !Number.isInteger(ticketId) || ticketId <= 0) {
     notFound();
