@@ -49,10 +49,11 @@ services:
     volumes:
       - ./apps/web:/app
       - web_node_modules:/app/node_modules
-      - web_next_cache:/app/.next
+    tmpfs:
+      - /app/.next
     ports:
       - "3000:3000"
-    command: sh -c "(test -d node_modules/next || npm install) && mkdir -p /app/.next/static/development && npm run dev"
+    command: sh -c "(test -d node_modules/next || npm install) && mkdir -p /app/.next && (rm -rf /app/.next/* /app/.next/.[!.]* /app/.next/..?* 2>/dev/null || true) && npm run dev"
 
   mailpit:
     image: ${MAILPIT_IMAGE}
@@ -67,4 +68,3 @@ services:
 
 volumes:
   web_node_modules:
-  web_next_cache:

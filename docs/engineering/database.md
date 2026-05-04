@@ -34,7 +34,7 @@ Define database and migration rules for the PostgreSQL-only Laravel backend.
 - `docs/architecture/database-design.md` defines intended tables and status values.
 - `apps/api/phpunit.xml` points tests at the Docker PostgreSQL service.
 - `compose.yaml` keeps PostgreSQL on the private network with no host port mapping.
-- Current generated Laravel migrations only include users, cache, jobs, and Sanctum tokens. Domain migrations are pending.
+- Current generated Laravel migrations include users, cache, jobs, Sanctum tokens, workspaces, workspace members, tickets, and ticket messages. AI/policy/audit domain migrations are pending.
 
 ## Common Mistakes To Avoid
 

@@ -9,6 +9,10 @@ Laravel 12 API application for SupportFlow Lite AI.
 - `routes/api.php` enabled through Laravel bootstrap routing.
 - `statefulApi()` middleware enabled for first-party SPA authentication.
 - `User` model configured with `HasApiTokens`.
+- Role-prefixed auth/session endpoints for `owner`, `admin`, and `staff` portals.
+- Workspace endpoints with membership role-aware access.
+- Workspace-scoped ticket endpoints (list/create/show/update/status/delete) behind policy checks.
+- Feature test coverage for auth, workspace, and ticket API behavior.
 - PostgreSQL, Redis, Mailpit, and AI provider defaults in `.env.example`.
 
 ## Database
@@ -78,5 +82,8 @@ The API currently exposes:
 - `GET /api/admin/workspaces`, `GET /api/admin/workspaces/{workspace}` — admin workspace routes.
 - `POST /api/staff/auth/login`, `GET /api/staff/auth/me`, `POST /api/staff/auth/logout` — staff session routes for owner, admin, agent, and viewer memberships.
 - `GET /api/staff/workspaces`, `GET /api/staff/workspaces/{workspace}` — staff workspace routes.
+- `GET|POST /api/{portal}/workspaces/{workspace}/tickets` — ticket list/create routes for `owner`, `admin`, and `staff` portals.
+- `GET|PATCH|DELETE /api/{portal}/workspaces/{workspace}/tickets/{ticket}` — ticket detail/update/delete routes for all portals.
+- `PATCH /api/{portal}/workspaces/{workspace}/tickets/{ticket}/status` — ticket status transitions for all portals.
 
-Domain routes for tickets, policy documents, AI runs, and audit logs are still pending.
+Still pending: policy document routes, AI run routes/pipeline endpoints, and audit/team management endpoints.

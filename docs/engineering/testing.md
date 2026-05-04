@@ -6,7 +6,7 @@ Define the current testing reality and the minimum bar for future changes.
 
 ## Current State
 
-- API tests exist only as generated Laravel example tests in `apps/api/tests`.
+- API feature tests cover auth, workspace access, and ticket endpoints in `apps/api/tests/Feature`.
 - `apps/api/phpunit.xml` targets PostgreSQL through the Docker service and sets queue/session/cache testing values.
 - Frontend has ESLint and Next build/typecheck, but no test runner and no `test` script in `apps/web/package.json`.
 - `make test-web` exists but currently calls a missing npm script.
@@ -24,7 +24,7 @@ Define the current testing reality and the minimum bar for future changes.
 
 - API focused test: `docker compose -f compose.yaml -f compose.dev.yaml exec api php artisan test --filter=TicketTest`.
 - Use `RefreshDatabase` for feature tests that write data.
-- Use factories for users and future workspace/domain models.
+- Use factories for users and workspace/ticket domain models.
 - Assert authorization failures, validation failures, and tenant isolation, not only happy paths.
 - For jobs, fake dependencies where possible and assert database state changes.
 
@@ -38,8 +38,8 @@ Define the current testing reality and the minimum bar for future changes.
 
 ## Examples From This Repository
 
-- `tests/Feature/ExampleTest.php` only asserts `/` returns 200. It does not cover the API.
-- `tests/Unit/ExampleTest.php` only asserts true is true.
+- `tests/Feature/AuthApiTest.php`, `tests/Feature/WorkspaceApiTest.php`, and `tests/Feature/TicketApiTest.php` provide real API coverage for authentication, authorization, validation, and tenant scoping.
+- `tests/Feature/ExampleTest.php` and `tests/Unit/ExampleTest.php` are still scaffold examples and should not be treated as domain coverage.
 - `phpunit.xml` sets `QUEUE_CONNECTION=sync`, which is useful for deterministic job tests while production uses Redis.
 
 ## Common Mistakes To Avoid

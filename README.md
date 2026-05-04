@@ -1,6 +1,6 @@
 # SupportFlow Lite AI
 
-> A multi-tenant AI support triage SaaS that classifies customer tickets, retrieves policy evidence, drafts replies, and logs every AI decision using Laravel queues, Next.js, and Mistral Experimental API.
+> A multi-tenant AI support triage SaaS scaffold with implemented auth/workspace/ticket foundations, built with Laravel, Next.js, and Docker.
 
 ---
 
@@ -21,13 +21,17 @@ SupportFlow Lite AI is a portfolio-grade system built to demonstrate:
 
 ## Current Status
 
-The monorepo now contains scaffolded application shells:
+Implemented now:
 
-- `apps/api` — Laravel 12 API application with Sanctum installed, API routes enabled, and PostgreSQL/Redis/Mailpit environment defaults.
-- `apps/web` — Next.js 15 App Router application with Tailwind CSS, a SupportFlow landing page, and `output: "standalone"` for Docker production builds.
-- `infra` — Dockerfiles, Nginx, Caddy, PHP config, and scripts for the API, worker, scheduler, web, PostgreSQL, Redis, and Mailpit services.
+- `apps/api` — role-prefixed auth/session APIs (`owner`, `admin`, `staff`), workspace membership APIs, and workspace-scoped ticket APIs (list/create/show/update/status/delete) with policies, requests, resources, and feature tests.
+- `apps/web` — owner/admin/staff login flows, workspace dashboards, and role-aware ticket queue/detail pages with ticket creation and status updates.
+- `infra` — Docker-first dev/prod runtime for API, worker, scheduler, web, PostgreSQL, Redis, Caddy, and Mailpit.
 
-The domain features are still pending. The next implementation step is a thin vertical slice: workspace, ticket creation, queued AI processing with a mock provider, and human review UI.
+Still pending:
+
+- AI pipeline implementation (jobs, provider layer, `ai_runs`, `ticket_ai_outputs`).
+- Policy knowledge base (`policy_documents`, `policy_chunks`).
+- Audit/analytics, billing mock, and team invitation/member management modules.
 
 ---
 
@@ -139,7 +143,7 @@ Production uses `compose.yaml` plus `compose.prod.yaml` and the pinned Docker im
 | `make api-shell` | Open shell inside the api container      |
 | `make web-shell` | Open shell inside the web container      |
 | `make test-api`  | Run Laravel tests                        |
-| `make test-web`  | Run frontend tests                       |
+| `make test-web`  | Currently fails (`npm run test` missing) |
 | `make logs`      | Tail all container logs                  |
 | `make queue-logs`| Tail queue worker logs only              |
 
@@ -160,7 +164,7 @@ docker compose -f compose.yaml -f compose.dev.yaml config --quiet
 
 ---
 
-## AI Pipeline
+## Planned AI Pipeline
 
 ```txt
 Ticket created
@@ -219,10 +223,10 @@ If Mistral rate limits → job retries (up to 3x with delay) → falls back to M
 
 ## Demo Credentials
 
-After seeding:
+After `make fresh` with the current default seeder:
 
 ```txt
-Email:    admin@supportflow.local
+Email:    test@example.com
 Password: password
 ```
 

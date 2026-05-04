@@ -8,7 +8,11 @@ Next.js 15 App Router dashboard for SupportFlow Lite AI.
 - TypeScript configuration.
 - Tailwind CSS configuration.
 - ESLint configuration.
-- SupportFlow-specific landing page in `src/app/page.tsx`.
+- SupportFlow landing page in `src/app/page.tsx`.
+- Portal auth screens for owner/admin/staff logins.
+- Owner/admin/staff workspace dashboards.
+- Role-aware ticket queue and ticket detail pages across portals.
+- Ticket creation and ticket status update server actions/forms.
 - Project metadata in `src/app/layout.tsx`.
 - `output: "standalone"` in `next.config.ts` for the production Docker image.
 
@@ -43,6 +47,8 @@ make npm-install
 make test-web
 ```
 
+`make test-web` currently fails because `apps/web/package.json` does not define an `npm run test` script yet.
+
 The development URL is `http://localhost:3000`.
 
 ## Production
@@ -65,4 +71,4 @@ The Docker runtime uses Node `24.15.0`.
 
 ## Current UI
 
-The scaffolded page is intentionally minimal. It confirms the frontend shell is wired and displays the configured API URL. The ticket dashboard, review queue, auth screens, and real-time job status UI are still pending.
+The frontend now includes live owner/admin/staff portal flows with workspace and ticket operations. Remaining UI work is primarily for the AI pipeline and supporting modules (AI review evidence, policy knowledge workflows, audit/analytics, team management).

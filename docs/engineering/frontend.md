@@ -32,7 +32,8 @@ Define Next.js rules for `apps/web` based on the current App Router scaffold, Ty
 
 ## Examples From This Repository
 
-- `src/app/page.tsx` currently displays a minimal scaffold page and reads `NEXT_PUBLIC_API_URL`.
+- `src/app/page.tsx` currently displays a minimal scaffold landing page and reads `NEXT_PUBLIC_API_URL`.
+- Owner/admin/staff portal pages exist for login, workspace access, and ticket queue/detail workflows.
 - `src/app/layout.tsx` imports `globals.css` and sets project metadata.
 - `eslint.config.mjs` extends `next/core-web-vitals` and `next/typescript`.
 - `package.json` has `dev`, `build`, `start`, and `lint`. It does not have `test`, `format`, or `typecheck` scripts.

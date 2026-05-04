@@ -35,7 +35,7 @@ Define Laravel-specific rules for `apps/api` based on the current Laravel 12 sca
 
 ## Examples From This Repository
 
-- `apps/api/routes/api.php` currently has only the Sanctum-protected `/user` route. Domain routes are pending.
+- `apps/api/routes/api.php` includes role-prefixed auth/workspace routes plus workspace-scoped ticket routes for owner/admin/staff portals.
 - `apps/api/app/Models/User.php` uses `HasApiTokens` and generated Laravel casts.
 - `apps/api/phpunit.xml` targets the Docker PostgreSQL service and uses sync queues for tests.
 - `apps/api/config/queue.php` still has generated fallback defaults in some keys. Do not rely on those defaults; project env files set Redis/PostgreSQL explicitly.
