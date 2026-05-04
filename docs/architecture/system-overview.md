@@ -4,6 +4,16 @@
 
 A multi-tenant AI support triage SaaS. Receives customer tickets, processes them through an async AI pipeline (classify → retrieve policy chunks → draft reply), and presents results to a human agent for review.
 
+## Current Implementation State
+
+The repository now has real application scaffolds instead of placeholders:
+
+- `apps/api` is a Laravel 12 API app with Sanctum, API routing, PostgreSQL environment defaults, Redis queue/cache/session defaults, and Mailpit SMTP defaults.
+- `apps/web` is a Next.js 15 App Router app with Tailwind CSS, TypeScript, ESLint, and standalone production output enabled.
+- The domain model and AI pipeline are documented but not implemented yet.
+
+PostgreSQL is the only configured application database. SQLite defaults from the generated Laravel scaffold were removed from project config and tests.
+
 ## Container Map
 
 ```

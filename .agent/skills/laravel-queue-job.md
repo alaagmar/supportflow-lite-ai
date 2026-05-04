@@ -73,10 +73,7 @@ For the AI pipeline, use a named queue:
 ProcessTicketAiPipelineJob::dispatch($ticket)->onQueue('ai');
 ```
 
-Worker command (in `compose.yaml`):
-```
-php artisan queue:work redis --queue=ai,default --sleep=3 --tries=3 --timeout=180
-```
+Worker execution is owned by the Docker `worker` service in `compose.yaml`. Do not run the queue worker directly on the host.
 
 ---
 

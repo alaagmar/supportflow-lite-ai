@@ -92,14 +92,7 @@ docker compose -f compose.yaml -f compose.dev.yaml exec postgres psql -U support
 ## Common Issues
 
 ### Entrypoint scripts not executable
-```bash
-# Fix locally:
-chmod +x infra/docker/api/entrypoint.prod.sh
-chmod +x infra/scripts/*.sh
-
-# Or inside the Dockerfile:
-RUN chmod +x /entrypoint.sh
-```
+Entrypoint permissions should be handled in Dockerfiles or committed file modes, not as a host-local setup step.
 
 ### Volume permission issues (Laravel storage)
 The `api_storage` volume is mounted at `/var/www/html/storage`.

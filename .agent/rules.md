@@ -138,7 +138,7 @@ The resolved workspace must be validated against the authenticated user's member
 To upgrade an image, update the pin in `.env` (root level), rebuild intentionally with `make dev`.
 
 ### 6.3 — Scripts must be executable
-All `.sh` files in `infra/` must have `chmod +x` run after creation.
+All `.sh` files in `infra/` must have executable file modes committed. Do not rely on host-local setup commands to fix script permissions.
 
 ---
 

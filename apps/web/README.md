@@ -1,34 +1,68 @@
-# SupportFlow Lite AI — Next.js Dashboard
+# SupportFlow Lite AI Web
 
-This directory will contain the Next.js 15 App Router dashboard.
+Next.js 15 App Router dashboard for SupportFlow Lite AI.
 
-## Setup
+## What Exists
 
-After the skeleton is in place, scaffold Next.js here:
+- Next.js 15.5 App Router scaffold.
+- TypeScript configuration.
+- Tailwind CSS configuration.
+- ESLint configuration.
+- SupportFlow-specific landing page in `src/app/page.tsx`.
+- Project metadata in `src/app/layout.tsx`.
+- `output: "standalone"` in `next.config.ts` for the production Docker image.
+
+## Environment
+
+Create `apps/web/.env` from `apps/web/.env.example` before starting the Docker stack.
+
+Important values:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8080
+SERVER_API_URL=http://api-nginx
+```
+
+`NEXT_PUBLIC_API_URL` is used by browser code. `SERVER_API_URL` is for server-side calls from the container network.
+
+## Development
+
+Preferred workflow from the repository root:
 
 ```bash
-# From the repo root:
-docker compose -f compose.yaml -f compose.dev.yaml run --rm web \
-    npx create-next-app@latest . --typescript --tailwind --app --no-git
+make dev
 ```
 
-Or manually copy your Next.js project into `apps/web/`.
+The web dev container mounts source code from `apps/web` and installs dependencies into the Docker `web_node_modules` volume on first start.
 
-## Required configuration after scaffolding
+Useful Docker commands:
 
-Add to `next.config.ts`:
-
-```ts
-const nextConfig = {
-  output: "standalone", // Required for production Docker image
-};
-
-export default nextConfig;
+```bash
+make web-shell
+make npm-install
+make test-web
 ```
 
-## Required after scaffolding
+The development URL is `http://localhost:3000`.
 
-1. Copy `apps/web/.env.example` to `apps/web/.env`
-2. Update `NEXT_PUBLIC_API_URL` to match your Laravel URL
-3. Run `make npm-install`
-4. Run `make dev`
+## Production
+
+Production is also Docker-only from the repository root:
+
+```bash
+make prod
+make prod-down
+```
+
+Run one-off web commands through Compose, not the host:
+
+```bash
+docker compose -f compose.yaml -f compose.dev.yaml exec web npm run lint
+docker compose -f compose.yaml -f compose.dev.yaml exec web npm run build
+```
+
+The Docker runtime uses Node `24.15.0`.
+
+## Current UI
+
+The scaffolded page is intentionally minimal. It confirms the frontend shell is wired and displays the configured API URL. The ticket dashboard, review queue, auth screens, and real-time job status UI are still pending.

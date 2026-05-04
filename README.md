@@ -19,6 +19,18 @@ SupportFlow Lite AI is a portfolio-grade system built to demonstrate:
 
 ---
 
+## Current Status
+
+The monorepo now contains scaffolded application shells:
+
+- `apps/api` — Laravel 12 API application with Sanctum installed, API routes enabled, and PostgreSQL/Redis/Mailpit environment defaults.
+- `apps/web` — Next.js 15 App Router application with Tailwind CSS, a SupportFlow landing page, and `output: "standalone"` for Docker production builds.
+- `infra` — Dockerfiles, Nginx, Caddy, PHP config, and scripts for the API, worker, scheduler, web, PostgreSQL, Redis, and Mailpit services.
+
+The domain features are still pending. The next implementation step is a thin vertical slice: workspace, ticket creation, queued AI processing with a mock provider, and human review UI.
+
+---
+
 ## Tech Stack
 
 | Layer       | Technology                           |
@@ -59,29 +71,51 @@ supportflow-lite-ai
 - Docker + Docker Compose v2
 - GNU Make
 
+All development and production workflows run through Docker. Do not run Composer, npm, Artisan, or Next.js directly on the host.
+
 ### Steps
 
+Create environment files from the examples before starting Docker:
+
+- `.env` from `.env.example`
+- `apps/api/.env` from `apps/api/.env.example`
+- `apps/web/.env` from `apps/web/.env.example`
+
+Start development:
+
 ```bash
-# 1. Clone the repo
-git clone https://github.com/yourusername/supportflow-lite-ai.git
-cd supportflow-lite-ai
-
-# 2. Copy environment file
-cp .env.development.example .env
-
-# 3. Install Laravel dependencies (first run)
-# (After apps/api is scaffolded)
-# make composer-install
-
-# 4. Start all services
 make dev
+```
 
-# 5. Generate Laravel key
+Generate the Laravel key if the API container did not create one:
+
+```bash
 make key-generate
+```
 
-# 6. Run migrations and seed demo data
+Run migrations and seed demo data when seeds exist:
+
+```bash
 make fresh
 ```
+
+The development containers install missing dependencies on first start:
+
+- `api` runs `composer install` when `apps/api/vendor` is missing.
+- `web` runs `npm install` into the Docker `web_node_modules` volume when `node_modules/next` is missing.
+
+### Database
+
+PostgreSQL is the only application database target. The scaffolded Laravel SQLite defaults were removed from project config and tests.
+
+### Production
+
+```bash
+make prod
+make prod-down
+```
+
+Production uses `compose.yaml` plus `compose.prod.yaml` and the pinned Docker image versions in the root `.env` file.
 
 ### Dev URLs
 
@@ -108,6 +142,21 @@ make fresh
 | `make test-web`  | Run frontend tests                       |
 | `make logs`      | Tail all container logs                  |
 | `make queue-logs`| Tail queue worker logs only              |
+
+---
+
+## Verification
+
+Run verification through Docker only. With the development stack running, use:
+
+```bash
+docker compose -f compose.yaml -f compose.dev.yaml exec api composer validate --strict
+docker compose -f compose.yaml -f compose.dev.yaml exec api composer audit
+docker compose -f compose.yaml -f compose.dev.yaml exec api php artisan route:list
+docker compose -f compose.yaml -f compose.dev.yaml exec web npm run lint
+docker compose -f compose.yaml -f compose.dev.yaml exec web npm run build
+docker compose -f compose.yaml -f compose.dev.yaml config --quiet
+```
 
 ---
 

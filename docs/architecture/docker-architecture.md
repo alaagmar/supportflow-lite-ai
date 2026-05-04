@@ -19,6 +19,16 @@
 2. **One backend image** — `api`, `worker`, `scheduler` all share the same Dockerfile
 3. **Two networks** — `public` (caddy, api-nginx, web) and `private` (internal only)
 4. **Named volumes** — postgres_data, redis_data, api_storage, api_public, caddy_data, caddy_config
+5. **PostgreSQL only** — Laravel app and tests target PostgreSQL; SQLite scaffold defaults are not used
+
+## Scaffolded Apps
+
+The app directories are now real framework scaffolds:
+
+- `apps/api` contains a Laravel 12 API application with Sanctum and API routes enabled.
+- `apps/web` contains a Next.js 15 App Router application configured for standalone output.
+
+In development, `apps/api` and `apps/web` are bind-mounted into their containers. The API container installs Composer dependencies when `vendor/` is missing. The web container installs npm dependencies into the `web_node_modules` named volume when `node_modules/next` is missing.
 
 ## Compose File Strategy
 

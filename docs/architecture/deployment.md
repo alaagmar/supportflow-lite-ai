@@ -7,35 +7,25 @@
 - A domain name with DNS pointing to your server
 - Port 80 and 443 open
 
+All deployment operations are Docker-based. Do not run Composer, npm, Artisan, or Next.js directly on the host.
+
 ## Steps
 
-### 1. Clone the repository
+### 1. Prepare the repository
 
-```bash
-git clone https://github.com/yourusername/supportflow-lite-ai.git
-cd supportflow-lite-ai
-```
+Place the repository on the server and run commands from the repository root.
 
 ### 2. Configure environment
 
-```bash
-cp .env.production.example .env
-# Edit .env — set real DB password, Mistral key, domain names
-```
+Create `.env` from `.env.production.example`, then set real image pins, database credentials, AI keys, and domain names.
 
 ### 3. Set up apps/api/.env
 
-```bash
-cp apps/api/.env.example apps/api/.env
-# Edit with production values
-```
+Create `apps/api/.env` from `apps/api/.env.example`, then edit it with production values.
 
 ### 4. Set up apps/web/.env
 
-```bash
-cp apps/web/.env.example apps/web/.env
-# Edit NEXT_PUBLIC_API_URL to your real domain
-```
+Create `apps/web/.env` from `apps/web/.env.example`, then set `NEXT_PUBLIC_API_URL` to the production API URL.
 
 ### 5. Update Caddyfile
 
