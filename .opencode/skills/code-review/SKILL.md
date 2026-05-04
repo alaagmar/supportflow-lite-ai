@@ -42,6 +42,10 @@ I review changes in this Laravel 12, Next.js 15, PostgreSQL, Redis, Docker monor
 - Next.js owns UI and API calls only.
 - Role rules follow `AGENTS.md`: Owner all; Admin operational management except owner-only settings; Agent assigned-ticket and AI draft review work; Viewer read-only.
 - Domain work should have one clear owning bounded context and avoid duplicate per-role implementations of the same operation.
+- Role-prefixed `/api/owner`, `/api/admin`, and `/api/staff` endpoints should be thin portal adapters over shared module behavior. Single-action invokable controllers are the expected shape for new API endpoints.
+- Current portal access rules are Owner portal: owner; Admin portal: owner/admin; Staff portal: owner/admin/agent/viewer. Workspace creation remains owner-only.
+- New successful API responses should use API Resources and `App\Http\Responses\ApiResponse` where practical; custom app exceptions belong under `app/Exceptions`.
+- Workspace reads should be scoped through authenticated memberships before data is exposed, and non-member access should not leak tenant existence.
 - PostgreSQL is the only database target.
 - Redis is the intended queue/cache/session backend.
 - AI work must be queued and provider-abstracted once implemented.
@@ -54,6 +58,8 @@ I review changes in this Laravel 12, Next.js 15, PostgreSQL, Redis, Docker monor
 - Approving host-local Composer/npm/Artisan instructions.
 - Approving UI-only permission checks without Laravel policy enforcement.
 - Approving duplicated role-specific modules where policies should vary behavior inside one bounded context.
+- Approving copied business logic across owner/admin/staff controllers instead of shared use cases or scoped relationships.
+- Approving multi-action API controllers for new endpoint work without a concrete reason.
 - Requiring code to match unimplemented planned services exactly.
 - Missing frontend production impact from changes to `next.config.ts`.
 - Ignoring `.env`/secret risk in docs and examples.

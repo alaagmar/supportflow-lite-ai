@@ -44,8 +44,18 @@ I design and check SupportFlow feature slices so they stay modular, role-aware, 
 - Keep routes, controllers, requests, resources, policies, models, jobs, migrations, factories, and seeders in conventional Laravel locations unless there is a concrete reason to do otherwise.
 - Use `app/Domain/<Module>` for reusable business behavior only after it exists: actions, services, DTOs, value objects, enums, prompt builders, retrieval logic, or provider contracts.
 - Keep controllers thin: validate, authorize, delegate to domain behavior or Eloquent relationships, then return resources.
-- Use policies for role differences. Do not duplicate controllers, models, tables, or routes per role for the same domain operation.
+- Use policies for role differences. Role-prefixed owner/admin/staff controllers may exist as thin portal adapters, but do not duplicate models, tables, repositories, use cases, resources, or business rules per role for the same domain operation.
+- Prefer single-action invokable API controllers. Shared module behavior belongs in `app/Domain/<Module>` once real behavior exists.
+- Use `App\Http\Responses\ApiResponse` and API Resources for new successful JSON responses where practical. Keep custom app exceptions under `app/Exceptions`.
 - Scope tenant data through workspace membership and module relationships before model access. Do not fetch by global ID then authorize afterward.
+
+# Current Backend Norms
+
+- API route groups are role-prefixed: `/api/owner`, `/api/admin`, and `/api/staff`.
+- Owner portal accepts owner memberships only; Admin portal accepts owner/admin memberships; Staff portal accepts owner/admin/agent/viewer memberships.
+- Workspace creation is owner-only and must create the owner membership in the same transaction.
+- Workspace reads should be scoped through authenticated user memberships and avoid leaking non-member workspace existence.
+- Identity and Workspace already use shared domain contracts, repositories, use cases, Form Requests, API Resources, policies, and feature tests. Follow that shape for adjacent backend slices unless a smaller conventional Laravel path is clearly enough.
 
 # Next.js 15 Guidance
 
@@ -57,7 +67,7 @@ I design and check SupportFlow feature slices so they stay modular, role-aware, 
 
 # Mistakes to avoid
 
-- Creating Owner/Admin/Agent/Viewer copies of the same module instead of one module with policy-controlled capabilities.
+- Creating Owner/Admin/Agent/Viewer copies of the same domain module instead of portal adapters plus one module with policy-controlled capabilities.
 - Adding empty DDD folders, repositories, managers, or abstractions before behavior needs them.
 - Letting Next.js own authorization, persistence, queue orchestration, AI provider calls, or audit writes.
 - Mixing module work with unrelated Docker, dependency, env, or formatting changes.

@@ -40,6 +40,9 @@ I make database changes that stay PostgreSQL-only, tenant-safe, role-aware, modu
 - PostgreSQL only. No SQLite or MySQL-specific workflow.
 - Tenant-owned rows require non-null `workspace_id`.
 - `workspace_members` is the expected source for per-workspace roles unless an explicit future RBAC design replaces it.
+- Current valid workspace member roles are `owner`, `admin`, `agent`, and `viewer`; enforce changes with PostgreSQL-compatible constraints and matching factories/tests.
+- Workspace-owned behavior should scope through authenticated user memberships before exposing rows to policies or resources.
+- Workspace creation must create the initial owner membership transactionally and remain owner-only.
 - AI/audit payloads use JSON columns where appropriate.
 - Destructive migration/reset commands require explicit approval.
 

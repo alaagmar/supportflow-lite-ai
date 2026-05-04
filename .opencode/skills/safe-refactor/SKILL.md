@@ -42,7 +42,9 @@ I plan and execute behavior-preserving refactors while protecting Docker topolog
 - Preserve npm for `apps/web` because `package-lock.json` exists.
 - Preserve Docker-only commands and pinned image tags.
 - Do not refactor around planned domain classes that are not implemented yet.
-- Do not split code by role when the correct boundary is a domain module plus policy checks.
+- Role-prefixed controller splits are acceptable when they are thin portal adapters. Do not split repositories, use cases, models, tables, policies, or resources by role unless the domain behavior truly differs.
+- Prefer single-action invokable controllers for API endpoint refactors.
+- Preserve API response compatibility when introducing `ApiResponse`; keep Laravel validation/auth/404 shapes unless intentionally changed and tested.
 
 # Mistakes to avoid
 

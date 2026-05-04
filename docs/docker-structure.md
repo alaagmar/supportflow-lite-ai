@@ -166,7 +166,7 @@ services:
       POSTGRES_USER: supportflow
       POSTGRES_PASSWORD: supportflow
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
     networks:
       - private
     healthcheck:

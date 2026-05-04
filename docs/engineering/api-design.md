@@ -32,9 +32,9 @@ Define how JSON API endpoints should be added to the Laravel API and consumed by
 
 ## Examples From This Repository
 
-- Existing `GET /api/user` is Sanctum-protected in `routes/api.php`.
+- Existing auth and workspace endpoints are grouped by role prefix under `/api/owner`, `/api/admin`, and `/api/staff` in `routes/api.php`.
 - Existing `GET /sanctum/csrf-cookie` is provided by Sanctum after `statefulApi()` was enabled.
-- Domain endpoints for workspaces, tickets, policy documents, AI runs, and audit logs are not implemented yet.
+- Domain endpoints for tickets, policy documents, AI runs, and audit logs are not implemented yet.
 
 ## Common Mistakes To Avoid
 

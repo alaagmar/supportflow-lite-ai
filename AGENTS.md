@@ -9,7 +9,7 @@ The repository is a Docker-first monorepo:
 - Backend: Laravel 12 API in `apps/api`, Sanctum installed, API routing enabled, PostgreSQL/Redis/Mailpit env defaults.
 - Frontend: Next.js 15 App Router in `apps/web`, TypeScript, Tailwind CSS 4, ESLint, standalone output for Docker production builds.
 - Infrastructure: Docker Compose, PHP-FPM, Nginx, Caddy, PostgreSQL 18, Redis 8, Mailpit, scripts in `infra/`.
-- Current state: framework shells exist; the domain model, ticket workflow, AI provider layer, review UI, and real tests are still pending.
+- Current state: Identity and Workspace foundations exist with role-prefixed auth/workspace APIs, workspace membership roles, owner/staff frontend entry points, and backend feature tests. Ticket workflow, AI provider layer, policy knowledge base, review UI, audit/analytics, billing mock, and team invitation/member management are still pending.
 
 All development and production workflows are Docker-based. Do not run Composer, npm, Artisan, Next.js, queue workers, or tests directly on the host.
 
@@ -58,7 +58,14 @@ These roles come from `docs/copy1.md` and define authorization expectations acro
 - Agent: can view and work assigned tickets, process tickets, review/edit/approve/reject AI drafts, assign tickets where policy allows, and resolve tickets. Agents cannot manage policies, team membership, provider settings, or owner-only workspace settings.
 - Viewer: can view tickets, analytics, and audit logs. Viewers cannot edit, approve, process, assign, delete, or mutate tenant data.
 
-Roles are workspace membership capabilities, not separate application silos. Do not duplicate database tables, API controllers, or Next.js route trees per role when the underlying domain operation is the same. Enforce role differences with Laravel Policies/Gates and Form Requests on the backend, then mirror the allowed actions in the UI as affordances only.
+Roles are workspace membership capabilities, not separate application silos. Do not duplicate database tables, domain use cases, repositories, policies, or Next.js workflow trees per role when the underlying domain operation is the same. Role-prefixed portal API entry points are allowed for product/API clarity, but they must delegate to shared module behavior rather than copy business logic. Enforce role differences with Laravel Policies/Gates and Form Requests on the backend, then mirror the allowed actions in the UI as affordances only.
+
+Current portal access rules:
+
+- Owner portal: `owner` memberships only.
+- Admin portal: `owner` and `admin` memberships.
+- Staff portal: `owner`, `admin`, `agent`, and `viewer` memberships.
+- Workspace creation is owner-only. Viewer access is read-only even when authenticated through the staff portal.
 
 ## Modular DDD Boundaries
 
@@ -77,6 +84,10 @@ Laravel 12 module guidance:
 - Put reusable domain behavior under `app/Domain/<Module>` when a module has real business logic, such as actions, services, DTOs, value objects, enums, prompt builders, or retrieval logic. Do not create empty domain layers before behavior exists.
 - Use Eloquent relationships from the owning aggregate/root model where practical, for example workspace-scoped ticket and policy queries. Never retrieve tenant data globally and then check access afterward.
 - Keep external integrations behind module-owned interfaces in the domain/service layer. Controllers should orchestrate validation, authorization, delegation, and resources only.
+- Use single-action invokable controllers for new JSON API endpoints. Each endpoint controller should validate, authorize, delegate to a use case or scoped Eloquent relationship, and return an API Resource through `App\Http\Responses\ApiResponse` where practical.
+- Keep role-prefixed controllers thin. Owner/Admin/Staff controllers may exist as portal entry points, but shared behavior belongs in `app/Domain/<Module>/UseCases`, contracts, repositories, resources, policies, and requests.
+- Put app-wide custom exceptions under `app/Exceptions`. Domain classes may throw them, but HTTP rendering should stay consistent with Laravel JSON responses or `ApiResponse::error(...)` for custom app errors.
+- Use `AuthSessionResource`, `CurrentSessionResource`, `UserResource`, and `WorkspaceResource` patterns for Identity/Workspace responses. Preserve Laravel's standard validation error shape.
 
 Next.js 15 module guidance:
 
@@ -93,10 +104,13 @@ Next.js 15 module guidance:
 - PostgreSQL is the only app database target. Do not add SQLite workflows, SQLite test defaults, MySQL-specific migrations, or host database assumptions.
 - Redis is the intended queue/cache/session backend. AI ticket processing must be asynchronous through Laravel jobs, not controller-side synchronous work.
 - Use Sanctum for first-party API auth. Workspace-scoped API routes must be authenticated and authorized before touching tenant data.
+- Role-specific API route groups currently use `/api/owner/...`, `/api/admin/...`, and `/api/staff/...`. Add new role-prefixed routes only as portal entry points; do not fork the domain model or duplicate business logic behind them.
 - Apply the Owner/Admin/Agent/Viewer role matrix through policies for every workspace-scoped capability; never trust client-side role checks or client-provided `workspace_id` as authorization.
+- Scope workspace reads through the authenticated user's memberships before returning tenant data. Prefer `404` for non-member workspace access so existence is not leaked.
 - Tenant-owned database tables must include non-null `workspace_id`, a foreign key, and useful indexes. Queries for tenant data must be scoped to the current workspace.
 - Do not call Mistral or any AI provider from controllers, React components, routes, or migrations. Add provider calls behind a Laravel service interface and validate JSON before saving.
 - Laravel API responses should use Form Requests for validation and API Resources for model output once domain endpoints are added.
+- Use `ApiResponse` for successful resource wrappers, no-content responses, and custom app errors in new API code. Do not replace Laravel's built-in validation/auth/404 JSON shapes unless there is a specific compatibility reason.
 - Keep Eloquent access in Laravel controllers/services/jobs. Do not introduce direct database access in Next.js.
 - Keep Next.js data fetching centralized in typed API utilities when added. Do not scatter raw `fetch` calls across components.
 - Keep `next.config.ts` standalone output unless the Docker production image is changed at the same time.

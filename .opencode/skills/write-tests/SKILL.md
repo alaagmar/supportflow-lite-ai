@@ -29,17 +29,21 @@ I add meaningful tests that match the current tooling: Laravel PHPUnit tests for
 1. Identify the behavior and risk being tested.
 2. Identify the owning module and the allowed roles for the behavior.
 3. Choose feature tests for API behavior and unit tests for isolated service logic.
-4. Use PostgreSQL-compatible Laravel testing paths; do not introduce SQLite.
-5. Fake external AI or HTTP dependencies.
-6. Cover failure, tenant isolation, and role authorization paths, not only happy paths.
-7. Run focused tests first, then broader `make test-api` when feasible.
-8. For frontend changes, run lint/build unless a test runner has been added.
+4. For role-prefixed API work, cover the relevant `/api/owner`, `/api/admin`, and `/api/staff` portal behavior instead of only the shared use case.
+5. Use PostgreSQL-compatible Laravel testing paths; do not introduce SQLite.
+6. Fake external AI or HTTP dependencies.
+7. Cover failure, tenant isolation, and role authorization paths, not only happy paths.
+8. Run focused tests first, then broader `make test-api` when feasible.
+9. For frontend changes, run lint/build unless a test runner has been added.
 
 # Project rules
 
 - Queue tests should verify idempotency, state transitions, and failure state.
 - Tenant features require tenant isolation tests.
 - Workspace features require role tests for Owner/Admin/Agent/Viewer where the capability differs.
+- Current portal access tests should preserve Owner portal owner-only access, Admin portal owner/admin access, Staff portal owner/admin/agent/viewer access, and Viewer read-only behavior.
+- Auth tests should preserve throttling and 8-hour Sanctum token expiry for portal sessions.
+- Workspace list/show tests should assert non-member tenant access does not leak data.
 - AI provider tests must never call real Mistral.
 - Generated example tests do not count as coverage for domain behavior.
 

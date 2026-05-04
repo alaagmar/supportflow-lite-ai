@@ -45,11 +45,16 @@ I review security-sensitive changes for tenant data exposure, role escalation, s
 - External AI output is untrusted until validated.
 - Client-provided workspace IDs are not authorization.
 - Client-side role checks are not security controls.
+- Current portal gates must hold: owner portal owner-only, admin portal owner/admin, staff portal owner/admin/agent/viewer.
+- Viewer access through the staff portal must remain read-only.
+- Workspace reads should be membership-scoped before returning data, preferably yielding `404` for non-member records.
+- Sanctum portal tokens should keep the implemented 8-hour expiry unless a security review approves a change.
 
 # Mistakes to avoid
 
 - Assuming authentication implies tenant authorization.
 - Assuming a hidden frontend action means the API is protected.
+- Letting role-prefixed portal controllers bypass shared policies or membership scoping.
 - Logging full request bodies for tickets or AI prompts.
 - Adding production Mailpit or dev debug settings by accident.
 - Exposing container internals for convenience.

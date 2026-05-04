@@ -67,10 +67,16 @@ docker compose -f compose.yaml -f compose.dev.yaml exec api composer validate --
 
 ## Current Routes
 
-The scaffold currently exposes:
+The API currently exposes:
 
 - `GET /up` — Laravel health route.
-- `GET /api/user` — Sanctum-protected user endpoint.
 - `GET /sanctum/csrf-cookie` — Sanctum CSRF cookie endpoint.
+- `POST /api/owner/auth/register` — owner account and first workspace registration.
+- `POST /api/owner/auth/login`, `GET /api/owner/auth/me`, `POST /api/owner/auth/logout` — owner session routes.
+- `GET /api/owner/workspaces`, `POST /api/owner/workspaces`, `GET /api/owner/workspaces/{workspace}` — owner workspace routes.
+- `POST /api/admin/auth/login`, `GET /api/admin/auth/me`, `POST /api/admin/auth/logout` — admin session routes.
+- `GET /api/admin/workspaces`, `GET /api/admin/workspaces/{workspace}` — admin workspace routes.
+- `POST /api/staff/auth/login`, `GET /api/staff/auth/me`, `POST /api/staff/auth/logout` — staff session routes for owner, admin, agent, and viewer memberships.
+- `GET /api/staff/workspaces`, `GET /api/staff/workspaces/{workspace}` — staff workspace routes.
 
-Domain routes for workspaces, tickets, policy documents, AI runs, and audit logs are still pending.
+Domain routes for tickets, policy documents, AI runs, and audit logs are still pending.

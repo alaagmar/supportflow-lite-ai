@@ -2,7 +2,18 @@
 
 namespace App\Providers;
 
+use App\Domain\Identity\Contracts\UserRepository;
+use App\Domain\Identity\Repositories\EloquentUserRepository;
+use App\Domain\Workspaces\Contracts\WorkspaceRepository;
+use App\Domain\Workspaces\Repositories\EloquentWorkspaceRepository;
+use App\Models\Workspace;
+use App\Policies\WorkspacePolicy;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -11,7 +22,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(UserRepository::class, EloquentUserRepository::class);
+        $this->app->bind(WorkspaceRepository::class, EloquentWorkspaceRepository::class);
     }
 
     /**
@@ -19,6 +31,18 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Gate::policy(Workspace::class, WorkspacePolicy::class);
+
+        RateLimiter::for('auth-login', function (Request $request): Limit {
+            $email = Str::lower((string) $request->input('email', ''));
+
+            return Limit::perMinute(5)->by('auth-login:'.$email.'|'.$request->ip());
+        });
+
+        RateLimiter::for('auth-register-owner', function (Request $request): Limit {
+            $email = Str::lower((string) $request->input('email', ''));
+
+            return Limit::perMinute(3)->by('auth-register-owner:'.$email.'|'.$request->ip());
+        });
     }
 }
