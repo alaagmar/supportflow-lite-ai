@@ -53,7 +53,7 @@ services:
       - /app/.next
     ports:
       - "3000:3000"
-    command: sh -c "(test -d node_modules/next || npm install) && mkdir -p /app/.next && (rm -rf /app/.next/* /app/.next/.[!.]* /app/.next/..?* 2>/dev/null || true) && npm run dev"
+    command: sh -c "(test -d node_modules/next || npm install) && mkdir -p /app/.next && (rm -rf /app/.next/* /app/.next/.[!.]* /app/.next/..?* 2>/dev/null || true) && npx next dev -H 0.0.0.0 -p 3000"
 
   mailpit:
     image: ${MAILPIT_IMAGE}
