@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\AiProcessing\UseCases;
 
 use App\Domain\AiProcessing\Contracts\AiProvider;
+use App\Domain\PolicyKnowledgeBase\UseCases\RetrievePolicyGuidance;
 use App\Models\AiRun;
 use App\Models\Ticket;
 use App\Models\TicketAiOutput;
@@ -13,7 +14,10 @@ use Throwable;
 
 final readonly class ProcessTicketAiPipeline
 {
-    public function __construct(private AiProvider $provider) {}
+    public function __construct(
+        private AiProvider $provider,
+        private RetrievePolicyGuidance $retrievePolicyGuidance,
+    ) {}
 
     public function handle(int $ticketId): void
     {
@@ -46,14 +50,22 @@ final readonly class ProcessTicketAiPipeline
 
             $this->completeRun($classificationRun, $classification, $classificationStartedAt);
 
+            $policyContext = $this->retrievePolicyGuidance->handle(
+                workspaceId: (int) $ticket->workspace_id,
+                queryText: trim($ticket->subject.' '.$ticket->body),
+                categoryHint: $classification['category'],
+                limit: 3,
+            );
+
             $draftRun = $this->startRun($ticket, AiRun::TASK_DRAFT_REPLY, [
                 'ticket' => $this->ticketPayload($ticket),
                 'classification' => $classification,
+                'policy_context' => $policyContext,
             ]);
 
             $draftStartedAt = microtime(true);
             $draft = $this->validatedDraft(
-                $this->provider->draftReply($this->ticketPayload($ticket), []),
+                $this->provider->draftReply($this->ticketPayload($ticket), $policyContext),
             );
 
             $this->completeRun($draftRun, $draft, $draftStartedAt);
@@ -75,7 +87,10 @@ final readonly class ProcessTicketAiPipeline
                     'recommended_action' => $draft['recommended_action'],
                     'requires_human_approval' => $draft['requires_human_approval'],
                     'confidence' => $draft['confidence'],
-                    'evidence_json' => $draft['evidence'],
+                    'evidence_json' => array_merge(
+                        $draft['evidence'],
+                        $this->policyEvidence($policyContext),
+                    ),
                 ],
             );
 
@@ -260,6 +275,28 @@ final readonly class ProcessTicketAiPipeline
 
         /** @var array<int, array<string, mixed>> $evidence */
         $evidence = array_values($value);
+
+        return $evidence;
+    }
+
+    /**
+     * @param  list<array{policy_document_id: int, policy_document_title: string, excerpt_text: string, relevance_score: float, rank: int}>  $context
+     * @return list<array<string, mixed>>
+     */
+    private function policyEvidence(array $context): array
+    {
+        $evidence = [];
+
+        foreach ($context as $item) {
+            $evidence[] = [
+                'source' => 'policy_document',
+                'policy_document_id' => $item['policy_document_id'],
+                'policy_document_title' => $item['policy_document_title'],
+                'excerpt_text' => $item['excerpt_text'],
+                'relevance_score' => $item['relevance_score'],
+                'rank' => $item['rank'],
+            ];
+        }
 
         return $evidence;
     }

@@ -4,6 +4,7 @@ import { logoutAction } from "@/app/actions";
 import { PortalTicketCreateForm } from "@/components/tickets/portal-ticket-create-form";
 import { TicketAiProcessForm } from "@/components/tickets/ticket-ai-process-form";
 import { TicketStatusForm } from "@/components/tickets/ticket-status-form";
+import { PolicyEvidenceList } from "@/features/policies/components/policy-evidence-list";
 import {
   apiRequest,
   ApiRequestError,
@@ -414,6 +415,13 @@ export async function PortalTicketDetailPage({ portal, params }: PortalTicketDet
             )}
 
             <div className="mt-5">
+              {portal === "staff" ? (
+                <div className="mb-5 rounded-2xl border border-white/10 bg-slate-900/60 p-4">
+                  <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Policy evidence</h3>
+                  <PolicyEvidenceList evidence={aiOutput?.evidence_json} />
+                </div>
+              ) : null}
+
               <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Recent AI runs</h3>
               {aiRuns.length > 0 ? (
                 <div className="mt-3 space-y-3">

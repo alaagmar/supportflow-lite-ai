@@ -110,6 +110,12 @@ function WorkspaceCard({ workspace }: { workspace: ApiWorkspace }) {
       >
         Open ticket queue
       </Link>
+      <Link
+        className="mt-4 inline-flex rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:border-cyan-300/30 hover:bg-cyan-300/10"
+        href={`/owner/workspaces/${workspace.id}/policies`}
+      >
+        Open knowledge base
+      </Link>
     </article>
   );
 }

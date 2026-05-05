@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Domain\Identity\Contracts\UserRepository;
 use App\Domain\Identity\Repositories\EloquentUserRepository;
+use App\Models\PolicyDocument;
 use App\Domain\AiProcessing\Contracts\AiProvider;
 use App\Domain\AiProcessing\Providers\MockAiProvider;
 use App\Domain\Ticketing\Contracts\TicketRepository;
@@ -12,6 +13,7 @@ use App\Domain\Workspaces\Contracts\WorkspaceRepository;
 use App\Domain\Workspaces\Repositories\EloquentWorkspaceRepository;
 use App\Models\Ticket;
 use App\Models\Workspace;
+use App\Policies\PolicyDocumentPolicy;
 use App\Policies\TicketPolicy;
 use App\Policies\WorkspacePolicy;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -41,6 +43,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(Workspace::class, WorkspacePolicy::class);
         Gate::policy(Ticket::class, TicketPolicy::class);
+        Gate::policy(PolicyDocument::class, PolicyDocumentPolicy::class);
 
         RateLimiter::for('auth-login', function (Request $request): Limit {
             $email = Str::lower((string) $request->input('email', ''));

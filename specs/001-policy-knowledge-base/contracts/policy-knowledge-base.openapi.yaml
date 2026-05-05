@@ -1,0 +1,277 @@
+openapi: 3.0.3
+info:
+  title: Policy Knowledge Base API
+  version: 1.0.0
+  description: Contracts for workspace policy document management and retrieval.
+paths:
+  /api/admin/workspaces/{workspace}/policies:
+    get:
+      summary: List policy documents in a workspace
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceId'
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, archived]
+      responses:
+        '200':
+          description: Policy document collection
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyDocumentCollectionResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      summary: Create a policy document
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePolicyDocumentRequest'
+      responses:
+        '201':
+          description: Policy document created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyDocumentResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/admin/workspaces/{workspace}/policies/{policy}:
+    patch:
+      summary: Update a policy document
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceId'
+        - $ref: '#/components/parameters/PolicyId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePolicyDocumentRequest'
+      responses:
+        '200':
+          description: Policy document updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyDocumentResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/admin/workspaces/{workspace}/policies/{policy}/archive:
+    post:
+      summary: Archive a policy document
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceId'
+        - $ref: '#/components/parameters/PolicyId'
+      responses:
+        '200':
+          description: Policy document archived
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyDocumentResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/admin/workspaces/{workspace}/policies/{policy}/unarchive:
+    post:
+      summary: Unarchive a policy document
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceId'
+        - $ref: '#/components/parameters/PolicyId'
+      responses:
+        '200':
+          description: Policy document unarchived
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyDocumentResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/staff/workspaces/{workspace}/policies/retrieve:
+    post:
+      summary: Retrieve policy guidance for ticket context
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PolicyRetrievalRequest'
+      responses:
+        '200':
+          description: Ranked policy guidance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyRetrievalResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+components:
+  parameters:
+    WorkspaceId:
+      name: workspace
+      in: path
+      required: true
+      schema:
+        type: integer
+    PolicyId:
+      name: policy
+      in: path
+      required: true
+      schema:
+        type: integer
+
+  schemas:
+    CreatePolicyDocumentRequest:
+      type: object
+      required: [title, content_text]
+      properties:
+        title:
+          type: string
+        content_text:
+          type: string
+        type:
+          type: string
+          default: text
+
+    UpdatePolicyDocumentRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        content_text:
+          type: string
+        type:
+          type: string
+
+    PolicyDocument:
+      type: object
+      required: [id, workspace_id, title, status, type]
+      properties:
+        id:
+          type: integer
+        workspace_id:
+          type: integer
+        title:
+          type: string
+        status:
+          type: string
+          enum: [active, archived]
+        type:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+
+    PolicyDocumentResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PolicyDocument'
+
+    PolicyDocumentCollectionResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyDocument'
+        meta:
+          type: object
+
+    PolicyRetrievalRequest:
+      type: object
+      required: [query_text]
+      properties:
+        query_text:
+          type: string
+        category_hint:
+          type: string
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 10
+
+    PolicyRetrievalItem:
+      type: object
+      required: [policy_document_id, policy_document_title, excerpt_text, rank]
+      properties:
+        policy_document_id:
+          type: integer
+        policy_document_title:
+          type: string
+        excerpt_text:
+          type: string
+        relevance_score:
+          type: number
+          format: float
+        rank:
+          type: integer
+
+    PolicyRetrievalResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyRetrievalItem'
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        errors:
+          type: object
+
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Action not permitted for current role
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ValidationError:
+      description: Request validation failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationErrorResponse'

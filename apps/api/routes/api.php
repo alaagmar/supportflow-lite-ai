@@ -6,6 +6,11 @@ use App\Http\Controllers\Admin\Auth\LogoutController as AdminLogoutController;
 use App\Http\Controllers\Portal\Tickets\CreateTicketController;
 use App\Http\Controllers\Portal\Tickets\DeleteTicketController;
 use App\Http\Controllers\Portal\Tickets\ListTicketsController;
+use App\Http\Controllers\Portal\Policies\ArchivePolicyDocumentController;
+use App\Http\Controllers\Portal\Policies\ListCreatePolicyDocumentController;
+use App\Http\Controllers\Portal\Policies\RetrievePolicyGuidanceController;
+use App\Http\Controllers\Portal\Policies\UnarchivePolicyDocumentController;
+use App\Http\Controllers\Portal\Policies\UpdatePolicyDocumentController;
 use App\Http\Controllers\Portal\Tickets\ProcessTicketAiController;
 use App\Http\Controllers\Portal\Tickets\ShowTicketController;
 use App\Http\Controllers\Portal\Tickets\ShowTicketAiOutputController;
@@ -76,11 +81,50 @@ $registerPortalTicketRoutes = static function (string $portal, string $portalAbi
         ->defaults('portal_ability', $portalAbility);
 };
 
-Route::prefix('owner')->group(function () use ($registerPortalTicketRoutes): void {
+$registerPortalPolicyRoutes = static function (string $portal, string $portalAbility, bool $allowMutations, bool $allowRetrieval): void {
+    Route::get('/workspaces/{workspace}/policies', ListCreatePolicyDocumentController::class)
+        ->whereNumber('workspace')
+        ->defaults('portal', $portal)
+        ->defaults('portal_ability', $portalAbility);
+
+    if ($allowMutations) {
+        Route::post('/workspaces/{workspace}/policies', ListCreatePolicyDocumentController::class)
+            ->whereNumber('workspace')
+            ->defaults('portal', $portal)
+            ->defaults('portal_ability', $portalAbility);
+
+        Route::patch('/workspaces/{workspace}/policies/{policy}', UpdatePolicyDocumentController::class)
+            ->whereNumber('workspace')
+            ->whereNumber('policy')
+            ->defaults('portal', $portal)
+            ->defaults('portal_ability', $portalAbility);
+
+        Route::post('/workspaces/{workspace}/policies/{policy}/archive', ArchivePolicyDocumentController::class)
+            ->whereNumber('workspace')
+            ->whereNumber('policy')
+            ->defaults('portal', $portal)
+            ->defaults('portal_ability', $portalAbility);
+
+        Route::post('/workspaces/{workspace}/policies/{policy}/unarchive', UnarchivePolicyDocumentController::class)
+            ->whereNumber('workspace')
+            ->whereNumber('policy')
+            ->defaults('portal', $portal)
+            ->defaults('portal_ability', $portalAbility);
+    }
+
+    if ($allowRetrieval) {
+        Route::post('/workspaces/{workspace}/policies/retrieve', RetrievePolicyGuidanceController::class)
+            ->whereNumber('workspace')
+            ->defaults('portal', $portal)
+            ->defaults('portal_ability', $portalAbility);
+    }
+};
+
+Route::prefix('owner')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes): void {
     Route::post('/auth/register', OwnerRegisterController::class)->middleware('throttle:auth-register-owner');
     Route::post('/auth/login', OwnerLoginController::class)->middleware('throttle:auth-login');
 
-    Route::middleware('auth:sanctum')->group(function () use ($registerPortalTicketRoutes): void {
+    Route::middleware('auth:sanctum')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes): void {
         Route::get('/auth/me', OwnerCurrentSessionController::class);
         Route::post('/auth/logout', OwnerLogoutController::class);
 
@@ -89,13 +133,14 @@ Route::prefix('owner')->group(function () use ($registerPortalTicketRoutes): voi
         Route::get('/workspaces/{workspace}', OwnerShowWorkspaceController::class)->whereNumber('workspace');
 
         $registerPortalTicketRoutes(Portal::OWNER, 'accessOwnerPortal');
+        $registerPortalPolicyRoutes(Portal::OWNER, 'accessOwnerPortal', true, false);
     });
 });
 
-Route::prefix('admin')->group(function () use ($registerPortalTicketRoutes): void {
+Route::prefix('admin')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes): void {
     Route::post('/auth/login', AdminLoginController::class)->middleware('throttle:auth-login');
 
-    Route::middleware('auth:sanctum')->group(function () use ($registerPortalTicketRoutes): void {
+    Route::middleware('auth:sanctum')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes): void {
         Route::get('/auth/me', AdminCurrentSessionController::class);
         Route::post('/auth/logout', AdminLogoutController::class);
 
@@ -103,13 +148,14 @@ Route::prefix('admin')->group(function () use ($registerPortalTicketRoutes): voi
         Route::get('/workspaces/{workspace}', AdminShowWorkspaceController::class)->whereNumber('workspace');
 
         $registerPortalTicketRoutes(Portal::ADMIN, 'accessAdminPortal');
+        $registerPortalPolicyRoutes(Portal::ADMIN, 'accessAdminPortal', true, false);
     });
 });
 
-Route::prefix('staff')->group(function () use ($registerPortalTicketRoutes): void {
+Route::prefix('staff')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes): void {
     Route::post('/auth/login', StaffLoginController::class)->middleware('throttle:auth-login');
 
-    Route::middleware('auth:sanctum')->group(function () use ($registerPortalTicketRoutes): void {
+    Route::middleware('auth:sanctum')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes): void {
         Route::get('/auth/me', StaffCurrentSessionController::class);
         Route::post('/auth/logout', StaffLogoutController::class);
 
@@ -117,5 +163,6 @@ Route::prefix('staff')->group(function () use ($registerPortalTicketRoutes): voi
         Route::get('/workspaces/{workspace}', StaffShowWorkspaceController::class)->whereNumber('workspace');
 
         $registerPortalTicketRoutes(Portal::STAFF, 'accessStaffPortal');
+        $registerPortalPolicyRoutes(Portal::STAFF, 'accessStaffPortal', false, true);
     });
 });

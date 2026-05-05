@@ -79,4 +79,20 @@ class Workspace extends Model
     {
         return $this->hasMany(TicketAiOutput::class);
     }
+
+    /**
+     * @return HasMany<PolicyDocument, $this>
+     */
+    public function policyDocuments(): HasMany
+    {
+        return $this->hasMany(PolicyDocument::class);
+    }
+
+    /**
+     * @return HasMany<PolicyChunk, $this>
+     */
+    public function policyChunks(): HasMany
+    {
+        return $this->hasMany(PolicyChunk::class);
+    }
 }
