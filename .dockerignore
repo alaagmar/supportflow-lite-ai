@@ -1,0 +1,14 @@
+.git/
+.dockerignore
+node_modules/
+apps/api/vendor/
+apps/api/node_modules/
+apps/web/node_modules/
+apps/web/.next/
+coverage/
+dist/
+build/
+*.log*
+.env*
+!.env.example
+!.env.*.example

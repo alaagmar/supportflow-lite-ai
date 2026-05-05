@@ -13,6 +13,7 @@ import {
   type TicketStatus,
   type WorkspacePayload,
 } from "@/lib/api";
+import type { PolicyDocumentPayload } from "@/lib/api/policies";
 import { clearAuthSession, getAuthPortal, getAuthToken, setAuthSession } from "@/lib/session";
 
 const PORTAL_LOGIN_PATH: Record<PortalSlug, string> = {
@@ -226,6 +227,135 @@ export async function processPortalTicketAiAction(
       ? "AI processing has been queued for this ticket."
       : "AI output is already in progress or ready to review.",
   };
+}
+
+export async function createPolicyDocumentAction(
+  _state: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const portal = portalFromFormData(formData);
+  const token = await getAuthToken();
+
+  if (!token) {
+    redirect(PORTAL_LOGIN_PATH[portal]);
+  }
+
+  const workspaceId = positiveIntegerFromFormData(formData, "workspace_id");
+
+  if (!workspaceId) {
+    return { message: "Unable to create policy because the workspace context is invalid." };
+  }
+
+  let policyDocument: PolicyDocumentPayload;
+
+  try {
+    policyDocument = await apiRequest<PolicyDocumentPayload>(`/api/${portal}/workspaces/${workspaceId}/policies`, {
+      method: "POST",
+      token,
+      body: JSON.stringify({
+        title: valueOf(formData, "title"),
+        content_text: valueOf(formData, "content_text"),
+        type: valueOf(formData, "type") || "text",
+      }),
+    });
+  } catch (error) {
+    return formError(error);
+  }
+
+  revalidatePath(`/${portal}/workspaces/${workspaceId}/policies`);
+
+  if (portal === "admin") {
+    redirect(`/${portal}/workspaces/${workspaceId}/policies/${policyDocument.data.id}`);
+  }
+
+  return { message: "Policy document created." };
+}
+
+export async function updatePolicyDocumentAction(
+  _state: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const portal = portalFromFormData(formData);
+  const token = await getAuthToken();
+
+  if (!token) {
+    redirect(PORTAL_LOGIN_PATH[portal]);
+  }
+
+  const workspaceId = positiveIntegerFromFormData(formData, "workspace_id");
+  const policyId = positiveIntegerFromFormData(formData, "policy_id");
+
+  if (!workspaceId || !policyId) {
+    return { message: "Unable to update policy because context is invalid." };
+  }
+
+  try {
+    await apiRequest<PolicyDocumentPayload>(`/api/${portal}/workspaces/${workspaceId}/policies/${policyId}`, {
+      method: "PATCH",
+      token,
+      body: JSON.stringify({
+        title: valueOf(formData, "title"),
+        content_text: valueOf(formData, "content_text"),
+      }),
+    });
+  } catch (error) {
+    return formError(error);
+  }
+
+  revalidatePath(`/${portal}/workspaces/${workspaceId}/policies`);
+  revalidatePath(`/${portal}/workspaces/${workspaceId}/policies/${policyId}`);
+
+  return { message: "Policy document updated." };
+}
+
+export async function archivePolicyDocumentAction(formData: FormData): Promise<void> {
+  const portal = portalFromFormData(formData);
+  const token = await getAuthToken();
+
+  if (!token) {
+    redirect(PORTAL_LOGIN_PATH[portal]);
+  }
+
+  const workspaceId = positiveIntegerFromFormData(formData, "workspace_id");
+  const policyId = positiveIntegerFromFormData(formData, "policy_id");
+
+  if (!workspaceId || !policyId) {
+    redirect(`/${portal}/workspaces`);
+  }
+
+  await apiRequest<PolicyDocumentPayload>(`/api/${portal}/workspaces/${workspaceId}/policies/${policyId}/archive`, {
+    method: "POST",
+    token,
+  });
+
+  revalidatePath(`/${portal}/workspaces/${workspaceId}/policies`);
+  revalidatePath(`/${portal}/workspaces/${workspaceId}/policies/${policyId}`);
+  redirect(`/${portal}/workspaces/${workspaceId}/policies`);
+}
+
+export async function unarchivePolicyDocumentAction(formData: FormData): Promise<void> {
+  const portal = portalFromFormData(formData);
+  const token = await getAuthToken();
+
+  if (!token) {
+    redirect(PORTAL_LOGIN_PATH[portal]);
+  }
+
+  const workspaceId = positiveIntegerFromFormData(formData, "workspace_id");
+  const policyId = positiveIntegerFromFormData(formData, "policy_id");
+
+  if (!workspaceId || !policyId) {
+    redirect(`/${portal}/workspaces`);
+  }
+
+  await apiRequest<PolicyDocumentPayload>(`/api/${portal}/workspaces/${workspaceId}/policies/${policyId}/unarchive`, {
+    method: "POST",
+    token,
+  });
+
+  revalidatePath(`/${portal}/workspaces/${workspaceId}/policies`);
+  revalidatePath(`/${portal}/workspaces/${workspaceId}/policies/${policyId}`);
+  redirect(`/${portal}/workspaces/${workspaceId}/policies/${policyId}`);
 }
 
 export async function logoutAction(): Promise<void> {

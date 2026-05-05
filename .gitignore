@@ -1,6 +1,6 @@
-.env
-.env.development
-.env.production
+.env*
+!.env.example
+!.env.*.example
 
 # App directories (not yet scaffolded)
 apps/api/vendor/
@@ -24,3 +24,11 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Common build artifacts
+dist/
+build/
+coverage/
+
+# Temporary files
+*.tmp

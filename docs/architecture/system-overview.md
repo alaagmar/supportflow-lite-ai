@@ -9,8 +9,17 @@ A multi-tenant AI support triage SaaS. Receives customer tickets, processes them
 The repository now has implemented application foundations:
 
 - `apps/api` is a Laravel 12 API app with Sanctum, role-prefixed auth/workspace/ticket endpoints, policy-backed authorization, and feature tests.
-- `apps/web` is a Next.js 15 App Router app with owner/admin/staff portal flows for login, workspace access, and ticket queue/detail workflows.
-- AI pipeline modules (provider integration, `ai_runs`, `ticket_ai_outputs`), policy knowledge workflows, and audit/analytics modules are still pending.
+- `apps/web` is a Next.js 15 App Router app with owner/admin/staff portal flows for login, workspace access, ticket queue/detail workflows, and owner/admin policy management screens.
+- AI pipeline modules (provider integration, `ai_runs`, `ticket_ai_outputs`) are implemented with policy retrieval context support; full audit/analytics modules remain pending.
+
+## Policy Knowledge Base APIs
+
+- `GET /api/{owner|admin|staff}/workspaces/{workspace}/policies` lists workspace policy documents, with optional `status=active|archived` filtering.
+- `POST /api/{owner|admin}/workspaces/{workspace}/policies` creates policy documents and regenerates policy chunks.
+- `PATCH /api/{owner|admin}/workspaces/{workspace}/policies/{policy}` updates document content and regenerates policy chunks.
+- `POST /api/{owner|admin}/workspaces/{workspace}/policies/{policy}/archive` archives a policy document.
+- `POST /api/{owner|admin}/workspaces/{workspace}/policies/{policy}/unarchive` restores a policy document to active status.
+- `POST /api/staff/workspaces/{workspace}/policies/retrieve` returns ranked policy evidence for ticket context.
 
 PostgreSQL is the only configured application database. SQLite defaults from the generated Laravel scaffold were removed from project config and tests.
 

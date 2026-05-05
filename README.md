@@ -17,6 +17,14 @@ SupportFlow Lite AI is a portfolio-grade system built to demonstrate:
 - **Queue-based processing** with retry logic and dead-letter handling
 - **Complete audit logging** of every AI decision and agent action
 
+## Project Constitution
+
+The project constitution lives in `.specify/memory/constitution.md`. Feature
+planning and implementation MUST preserve Docker-only execution, Laravel and
+Next.js ownership boundaries, tenant-scoped authorization, asynchronous
+validated AI processing, and Docker-based verification before work is treated as
+done.
+
 ---
 
 ## Current Status
@@ -24,13 +32,20 @@ SupportFlow Lite AI is a portfolio-grade system built to demonstrate:
 Implemented now:
 
 - `apps/api` — role-prefixed auth/session APIs (`owner`, `admin`, `staff`), workspace membership APIs, workspace-scoped ticket APIs (list/create/show/update/status/delete), and AI processing pipeline with queued jobs, provider interface, and mock fallback.
-- `apps/web` — owner/admin/staff login flows, workspace dashboards, role-aware ticket queue/detail pages, and AI review UI with classification results and draft reply approval.
+- `apps/api` — policy knowledge base APIs for policy document lifecycle (list/create/update/archive/unarchive), chunk retrieval, workspace-scoped authorization, and policy-focused feature tests.
+- `apps/web` — owner/admin/staff login flows, workspace dashboards, role-aware ticket queue/detail pages, AI review UI with classification results and policy evidence, and owner/admin policy management screens.
 - `infra` — Docker-first dev/prod runtime for API, worker, scheduler, web, PostgreSQL, Redis, Caddy, and Mailpit.
 
 Still pending:
 
-- Policy knowledge base (`policy_documents`, `policy_chunks`).
 - Audit/analytics, billing mock, and team invitation/member management modules.
+
+### Policy Workflow Notes
+
+- Owner and admin portals now expose policy management routes under `/workspaces/{workspaceId}/policies`.
+- Policy create/update automatically regenerates chunk records used by retrieval.
+- Staff ticket detail now shows policy evidence when AI output includes policy context.
+- Retrieval endpoint: `POST /api/staff/workspaces/{workspace}/policies/retrieve` with `query_text`, optional `category_hint`, and optional `limit`.
 
 ---
 

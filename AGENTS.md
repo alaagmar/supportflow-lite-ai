@@ -137,3 +137,9 @@ Next.js 15 module guidance:
 ## Definition of Done
 
 A change is done only when it solves the requested problem, follows the repo conventions, includes relevant tests or a clear reason tests were not added, runs the available relevant Docker-based verification commands, and reports what changed, what was verified, and what risk remains.
+
+<!-- SPECKIT START -->
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan:
+`specs/001-policy-knowledge-base/plan.md`
+<!-- SPECKIT END -->
