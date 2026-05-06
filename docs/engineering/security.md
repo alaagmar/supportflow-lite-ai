@@ -30,18 +30,18 @@ Protect tenant data, credentials, AI inputs/outputs, and production runtime conf
 - Public Docker port mappings for PostgreSQL, Redis, API PHP-FPM, worker, or scheduler.
 - Direct AI-to-production actions without human approval for risky ticket actions.
 - Trusting `workspace_id` from client input as proof of access.
-- Committing `auth.json`, private keys, `.pem`, app keys, database passwords, or AI provider API keys (for example `QWEN_API_KEY`).
+- Committing `auth.json`, private keys, `.pem`, app keys, database passwords, or AI provider API keys (for example `MISTRAL_API_KEY`).
 
 ## Examples From This Repository
 
 - `.gitignore` excludes root `.env` and app env files.
 - `compose.yaml` places `postgres` and `redis` only on the private network.
 - `infra/nginx/api.*.conf` blocks hidden files and routes PHP through FPM.
-- `apps/api/.env.example` currently has safe local defaults and an empty `QWEN_API_KEY`.
+- `apps/api/.env.example` currently has safe local defaults and an empty `MISTRAL_API_KEY`.
 
 ## Common Mistakes To Avoid
 
-- Adding a frontend env var for `QWEN_API_KEY` or server-only URLs with a `NEXT_PUBLIC_` prefix.
+- Adding a frontend env var for `MISTRAL_API_KEY` or server-only URLs with a `NEXT_PUBLIC_` prefix.
 - Logging `$request->all()` in controllers that handle tickets or auth.
 - Disabling authorization because a route is internal to the UI.
 - Adding Mailpit to production without a deliberate reason.

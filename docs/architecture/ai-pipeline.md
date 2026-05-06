@@ -12,7 +12,7 @@ status = processing
 Dispatch: ProcessTicketAiPipelineJob
       │
       ├── Stage 1: ClassifyTicketJob
-      │     └── POST to Qwen/NVIDIA → structured JSON
+      │     └── POST to Mistral API → structured JSON
       │         { category, urgency, sentiment, language, summary, confidence }
       │
       ├── Stage 2: RetrievePolicyChunksJob
@@ -20,7 +20,7 @@ Dispatch: ProcessTicketAiPipelineJob
       │         top 3–5 chunks by relevance to subject+body+category
       │
       ├── Stage 3: DraftTicketReplyJob
-      │     └── POST to Qwen/NVIDIA with ticket + chunks → structured JSON
+      │     └── POST to Mistral API with ticket + chunks → structured JSON
       │         { draft_reply, recommended_action, requires_human_approval, confidence, evidence }
       │
       └── Stage 4: Save results → status = needs_review
@@ -58,9 +58,9 @@ interface AiProvider
 }
 ```
 
-Implementations: `QwenNvidiaAiProvider`, `MockAiProvider`
+Implementations: `MistralAiProvider`, `MockAiProvider`
 
-**Implemented:** `AiProvider` contract, `QwenNvidiaAiProvider`, and `MockAiProvider` are implemented in `app/Domain/AiProcessing/`. The queued `ProcessTicketAiJob` dispatches AI work asynchronously.
+**Implemented:** `AiProvider` contract, `MistralAiProvider`, and `MockAiProvider` are implemented in `app/Domain/AiProcessing/`. The queued `ProcessTicketAiJob` dispatches AI work asynchronously.
 
 ## JSON Validation
 

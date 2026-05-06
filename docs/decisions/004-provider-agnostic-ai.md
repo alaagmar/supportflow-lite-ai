@@ -5,7 +5,7 @@
 
 ## Context
 
-The project currently uses Qwen via NVIDIA's API as the default AI provider. External AI APIs can rate limit or be unavailable, so the project should not be permanently tied to a single provider.
+The project currently uses Mistral as the default AI provider. External AI APIs can rate limit or be unavailable, so the project should not be permanently tied to a single provider.
 
 ## Decision
 
@@ -20,12 +20,12 @@ interface AiProvider
 ```
 
 Implementations:
-- `QwenNvidiaAiProvider` — calls NVIDIA's OpenAI-compatible chat completions endpoint, returns validated JSON
+- `MistralAiProvider` — calls Mistral's OpenAI-compatible chat completions endpoint, returns validated JSON
 - `MockAiProvider` — returns deterministic, low-confidence fallback responses
 
 Provider resolution controlled by:
 ```env
-AI_PROVIDER=qwen
+AI_PROVIDER=mistral
 AI_FALLBACK_PROVIDER=mock
 ```
 

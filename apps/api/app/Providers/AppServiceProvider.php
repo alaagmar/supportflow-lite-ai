@@ -6,8 +6,8 @@ use App\Domain\Identity\Contracts\UserRepository;
 use App\Domain\Identity\Repositories\EloquentUserRepository;
 use App\Models\PolicyDocument;
 use App\Domain\AiProcessing\Contracts\AiProvider;
+use App\Domain\AiProcessing\Providers\MistralAiProvider;
 use App\Domain\AiProcessing\Providers\MockAiProvider;
-use App\Domain\AiProcessing\Providers\QwenNvidiaAiProvider;
 use App\Domain\Ticketing\Contracts\TicketRepository;
 use App\Domain\Ticketing\Repositories\EloquentTicketRepository;
 use App\Domain\Workspaces\Contracts\WorkspaceRepository;
@@ -40,7 +40,7 @@ class AppServiceProvider extends ServiceProvider
 
             return match ($provider) {
                 'mock' => $app->make(MockAiProvider::class),
-                'qwen' => $app->make(QwenNvidiaAiProvider::class),
+                'mistral' => $app->make(MistralAiProvider::class),
                 default => throw new InvalidArgumentException("Unsupported AI provider [{$provider}]."),
             };
         });

@@ -31,7 +31,7 @@ Define how future code must fit the actual SupportFlow Lite AI monorepo without 
 
 ## Forbidden Patterns
 
-- Raw Qwen/NVIDIA or external AI HTTP calls from controllers, React components, route closures, migrations, or seeders.
+- Raw Mistral or external AI HTTP calls from controllers, React components, route closures, migrations, or seeders.
 - Tenant data queries such as `Ticket::find($id)` without workspace scoping once tenant models exist.
 - Direct database access from `apps/web`.
 - Host-local development instructions for Composer, npm, Artisan, Next.js, or queue workers.
