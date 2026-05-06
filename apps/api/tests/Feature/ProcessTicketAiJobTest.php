@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Domain\AiProcessing\Contracts\AiProvider;
+use App\Domain\AiProcessing\Providers\MockAiProvider;
 use App\Jobs\ProcessTicketAiJob;
 use App\Models\AiRun;
 use App\Models\Ticket;
@@ -17,6 +18,13 @@ use Tests\TestCase;
 class ProcessTicketAiJobTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->app->bind(AiProvider::class, MockAiProvider::class);
+    }
 
     public function test_it_processes_a_ticket_and_persists_ai_artifacts(): void
     {

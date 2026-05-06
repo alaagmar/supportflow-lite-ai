@@ -2,7 +2,7 @@
 
 Use **pinned lightweight stable tags**, not `latest`.
 
-Your project is a portfolio-grade Laravel + Next.js AI SaaS with queues, policy retrieval, human review, AI run logs, and mock/Mistral fallback. Docker must reflect that system shape: API, web, worker, scheduler, Postgres, Redis, reverse proxy, and dev-only email tooling. 
+Your project is a portfolio-grade Laravel + Next.js AI SaaS with queues, policy retrieval, human review, AI run logs, and provider-agnostic fallback (Qwen primary + mock fallback). Docker must reflect that system shape: API, web, worker, scheduler, Postgres, Redis, reverse proxy, and dev-only email tooling. 
 
 As of **30 April 2026**, these are the best lightweight stable image choices:
 
@@ -54,7 +54,7 @@ supportflow-lite-ai
     └── Dev-only email testing
 ```
 
-This fits your project because the MVP is not only CRUD. It must prove queued AI processing, retries, fallback handling, evidence retrieval, audit logs, and human review. Your own spec explicitly makes the queue pipeline central: ticket creation, processing status, queued AI job, Mistral classification, policy chunk retrieval, draft generation, then human review. 
+This fits your project because the MVP is not only CRUD. It must prove queued AI processing, retries, fallback handling, evidence retrieval, audit logs, and human review. Your own spec explicitly makes the queue pipeline central: ticket creation, processing status, queued AI job, provider classification, policy chunk retrieval, draft generation, then human review. 
 
 ---
 
@@ -689,12 +689,15 @@ MAIL_ENCRYPTION=null
 MAIL_FROM_ADDRESS=no-reply@supportflow.local
 MAIL_FROM_NAME="${APP_NAME}"
 
-AI_PROVIDER=mistral
+AI_PROVIDER=qwen
 AI_FALLBACK_PROVIDER=mock
 AI_MAX_RETRIES=3
 AI_RETRY_DELAY_SECONDS=60
-MISTRAL_API_KEY=
-MISTRAL_MODEL=mistral-small-latest
+QWEN_API_BASE_URL=https://integrate.api.nvidia.com/v1
+QWEN_API_KEY=
+QWEN_MODEL=qwen/qwen3-coder-480b-a35b-instruct
+QWEN_TEMPERATURE=0.2
+QWEN_TIMEOUT_SECONDS=30
 ```
 
 ---

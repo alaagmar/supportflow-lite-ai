@@ -7,6 +7,7 @@ use App\Domain\Identity\Repositories\EloquentUserRepository;
 use App\Models\PolicyDocument;
 use App\Domain\AiProcessing\Contracts\AiProvider;
 use App\Domain\AiProcessing\Providers\MockAiProvider;
+use App\Domain\AiProcessing\Providers\QwenNvidiaAiProvider;
 use App\Domain\Ticketing\Contracts\TicketRepository;
 use App\Domain\Ticketing\Repositories\EloquentTicketRepository;
 use App\Domain\Workspaces\Contracts\WorkspaceRepository;
@@ -22,6 +23,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,7 +35,15 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(UserRepository::class, EloquentUserRepository::class);
         $this->app->bind(WorkspaceRepository::class, EloquentWorkspaceRepository::class);
         $this->app->bind(TicketRepository::class, EloquentTicketRepository::class);
-        $this->app->bind(AiProvider::class, MockAiProvider::class);
+        $this->app->bind(AiProvider::class, function ($app): AiProvider {
+            $provider = strtolower((string) config('ai.provider', 'mock'));
+
+            return match ($provider) {
+                'mock' => $app->make(MockAiProvider::class),
+                'qwen' => $app->make(QwenNvidiaAiProvider::class),
+                default => throw new InvalidArgumentException("Unsupported AI provider [{$provider}]."),
+            };
+        });
     }
 
     /**

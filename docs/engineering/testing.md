@@ -17,7 +17,7 @@ Define the current testing reality and the minimum bar for future changes.
 - Prefer feature tests for API behavior and unit tests for isolated pure services.
 - Database tests must use PostgreSQL configuration, not SQLite shortcuts.
 - Queue-heavy features must test dispatching, idempotency, failure behavior, and state transitions.
-- AI provider code must have deterministic tests with the mock provider or faked HTTP responses. Do not call real Mistral in tests.
+- AI provider code must have deterministic tests with the mock provider or faked HTTP responses. Do not call real external AI providers in tests.
 - Frontend behavior needs a test runner before UI logic can be meaningfully tested. Until then, use lint/build as the available checks and state this limitation.
 
 ## Preferred Patterns
