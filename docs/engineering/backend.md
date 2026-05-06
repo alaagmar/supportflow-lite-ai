@@ -27,7 +27,7 @@ Define Laravel-specific rules for `apps/api` based on the current Laravel 12 sca
 ## Forbidden Patterns
 
 - Controller methods that process AI synchronously.
-- Direct HTTP calls to Qwen/NVIDIA (or any external AI provider) from controllers, routes, seeders, or React-facing endpoints.
+- Direct HTTP calls to Mistral (or any external AI provider) from controllers, routes, seeders, or React-facing endpoints.
 - Route closures for real domain endpoints beyond scaffold/health checks.
 - Using global tenant model lookups without workspace scoping once tenant models exist.
 - Returning Eloquent models directly for public API endpoints once resources exist.

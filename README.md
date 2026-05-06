@@ -12,7 +12,7 @@ SupportFlow Lite AI is a portfolio-grade system built to demonstrate:
 - **Laravel backend engineering** — queues, scheduler, Sanctum, Policies
 - **Next.js App Router dashboard** — real-time job status, human review UI
 - **Async AI pipeline** — classify → retrieve → draft → review
-- **Provider-agnostic AI layer** — Qwen (NVIDIA) primary, mock fallback, easy to swap
+- **Provider-agnostic AI layer** — Mistral primary, mock fallback, easy to swap
 - **Structured JSON outputs** from the configured provider with full validation
 - **Queue-based processing** with retry logic and dead-letter handling
 - **Complete audit logging** of every AI decision and agent action
@@ -55,7 +55,7 @@ Still pending:
 |-------------|--------------------------------------|
 | Frontend    | Next.js 15 App Router, Tailwind CSS  |
 | Backend API | Laravel 12, Sanctum, Queues          |
-| AI Provider | Qwen (NVIDIA API) + Mock             |
+| AI Provider | Mistral API + Mock                   |
 | Database    | PostgreSQL 18                        |
 | Cache/Queue | Redis 8                              |
 | Proxy       | Nginx (API) + Caddy (TLS)            |
@@ -187,13 +187,13 @@ status = processing
  ↓
 queue ProcessTicketAiPipelineJob
  ↓
-classify ticket with Qwen (JSON output)
+classify ticket with Mistral (JSON output)
  ↓
 store classification
  ↓
 retrieve policy chunks from DB (keyword search)
  ↓
-draft reply with Qwen (JSON output + evidence)
+draft reply with Mistral (JSON output + evidence)
  ↓
 store draft reply
  ↓
@@ -204,7 +204,7 @@ agent reviews and approves / edits / rejects
 
 ### Rate Limit Fallback
 
-If Qwen/NVIDIA rate limits or fails → job retries (up to 3x with delay) → falls back to MockAiProvider → ticket marked `needs_review` with low-confidence fallback output.
+If Mistral rate limits or fails → job retries (up to 3x with delay) → falls back to MockAiProvider → ticket marked `needs_review` with low-confidence fallback output.
 
 ---
 
@@ -244,4 +244,4 @@ Email:    test@example.com
 Password: password
 ```
 
-> The current demo defaults to Qwen via the NVIDIA API. The architecture remains provider-agnostic so production deployments can switch providers without rewriting ticketing business logic.
+> The current demo defaults to the Mistral API. The architecture remains provider-agnostic so production deployments can switch providers without rewriting ticketing business logic.
