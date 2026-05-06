@@ -10,7 +10,7 @@ The repository now has implemented application foundations:
 
 - `apps/api` is a Laravel 12 API app with Sanctum, role-prefixed auth/workspace/ticket endpoints, policy-backed authorization, and feature tests.
 - `apps/web` is a Next.js 15 App Router app with owner/admin/staff portal flows for login, workspace access, ticket queue/detail workflows, and owner/admin policy management screens.
-- AI pipeline modules (provider integration, `ai_runs`, `ticket_ai_outputs`) are implemented with policy retrieval context support; full audit/analytics modules remain pending.
+- AI pipeline modules (provider integration, `ai_runs`, `ticket_ai_outputs`) are implemented with policy retrieval context support; current default provider is Qwen via NVIDIA with mock available for deterministic fallback and tests; full audit/analytics modules remain pending.
 
 ## Policy Knowledge Base APIs
 

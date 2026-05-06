@@ -5,41 +5,40 @@
 
 ## Context
 
-The project uses Mistral Experimental API (free tier) as the AI provider. Free-tier APIs have rate limits, can be unavailable, and the project should not be permanently tied to a single provider.
+The project currently uses Qwen via NVIDIA's API as the default AI provider. External AI APIs can rate limit or be unavailable, so the project should not be permanently tied to a single provider.
 
 ## Decision
 
 Build an **AI Provider abstraction layer** behind a PHP interface.
 
 ```php
-interface AiProviderInterface
+interface AiProvider
 {
     public function classifyTicket(array $ticket): array;
     public function draftReply(array $ticket, array $contextChunks): array;
-    public function summarizeTicket(array $ticket): array;
 }
 ```
 
 Implementations:
-- `MistralAiProvider` — calls Mistral Experimental API, returns validated JSON
+- `QwenNvidiaAiProvider` — calls NVIDIA's OpenAI-compatible chat completions endpoint, returns validated JSON
 - `MockAiProvider` — returns deterministic, low-confidence fallback responses
 
 Provider resolution controlled by:
 ```env
-AI_PROVIDER=mistral
+AI_PROVIDER=qwen
 AI_FALLBACK_PROVIDER=mock
 ```
 
 ## Rationale
 
-- Controllers and jobs never call Mistral directly — only via the interface
+- Controllers and jobs never call provider APIs directly — only via the interface
 - Switching providers (OpenAI, Anthropic, Groq, local Ollama) requires adding a new implementation class, not touching business logic
-- `MockAiProvider` keeps the demo stable when Mistral rate limits or is unavailable
+- `MockAiProvider` keeps the demo stable when the primary provider rate limits or is unavailable
 - This is a strong portfolio talking point: "The system is provider-agnostic by design"
 
 ## Consequences
 
-- All AI calls go through `app/Services/Ai/AiProviderInterface.php`
-- Provider is resolved via Laravel's service container (`AiServiceProvider`)
+- All AI calls go through `app/Domain/AiProcessing/Contracts/AiProvider.php`
+- Provider is resolved via Laravel's service container binding in `app/Providers/AppServiceProvider.php`
 - `config/ai.php` manages provider selection and model config
 - Every AI task must return a validated PHP array matching the expected schema

@@ -74,7 +74,7 @@ Build new product work as thin vertical slices inside bounded contexts rather th
 - Identity and Workspace: users, workspaces, workspace members, role assignment, workspace switching, owner/admin settings.
 - Ticketing: tickets, ticket messages, comments, assignment, status changes, human review actions, ticket queue filters.
 - Policy Knowledge Base: policy documents, document ingestion, chunking, keyword retrieval, evidence display.
-- AI Processing: provider abstraction, Mistral/mock providers, prompt templates, JSON validation, queued ticket pipeline, ticket AI output.
+- AI Processing: provider abstraction, Qwen/mock providers, prompt templates, JSON validation, queued ticket pipeline, ticket AI output.
 - Audit and Analytics: audit logs, AI run timelines, usage metrics, dashboard summaries.
 - Billing Mock and Provider Settings: owner-only configuration screens and placeholder billing state until real billing is approved.
 
@@ -108,7 +108,7 @@ Next.js 15 module guidance:
 - Apply the Owner/Admin/Agent/Viewer role matrix through policies for every workspace-scoped capability; never trust client-side role checks or client-provided `workspace_id` as authorization.
 - Scope workspace reads through the authenticated user's memberships before returning tenant data. Prefer `404` for non-member workspace access so existence is not leaked.
 - Tenant-owned database tables must include non-null `workspace_id`, a foreign key, and useful indexes. Queries for tenant data must be scoped to the current workspace.
-- Do not call Mistral or any AI provider from controllers, React components, routes, or migrations. Add provider calls behind a Laravel service interface and validate JSON before saving.
+- Do not call Qwen or any AI provider from controllers, React components, routes, or migrations. Add provider calls behind a Laravel service interface and validate JSON before saving.
 - Laravel API responses should use Form Requests for validation and API Resources for model output once domain endpoints are added.
 - Use `ApiResponse` for successful resource wrappers, no-content responses, and custom app errors in new API code. Do not replace Laravel's built-in validation/auth/404 JSON shapes unless there is a specific compatibility reason.
 - Keep Eloquent access in Laravel controllers/services/jobs. Do not introduce direct database access in Next.js.

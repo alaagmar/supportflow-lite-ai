@@ -12,7 +12,7 @@ status = processing
 Dispatch: ProcessTicketAiPipelineJob
       │
       ├── Stage 1: ClassifyTicketJob
-      │     └── POST to Mistral → structured JSON
+      │     └── POST to Qwen/NVIDIA → structured JSON
       │         { category, urgency, sentiment, language, summary, confidence }
       │
       ├── Stage 2: RetrievePolicyChunksJob
@@ -20,7 +20,7 @@ Dispatch: ProcessTicketAiPipelineJob
       │         top 3–5 chunks by relevance to subject+body+category
       │
       ├── Stage 3: DraftTicketReplyJob
-      │     └── POST to Mistral with ticket + chunks → structured JSON
+      │     └── POST to Qwen/NVIDIA with ticket + chunks → structured JSON
       │         { draft_reply, recommended_action, requires_human_approval, confidence, evidence }
       │
       └── Stage 4: Save results → status = needs_review
@@ -29,7 +29,7 @@ Dispatch: ProcessTicketAiPipelineJob
 ## Rate Limit Handling
 
 ```
-Mistral returns 429
+Primary provider returns 429 / request failure
     │
     ▼
 Mark ai_run as rate_limited
@@ -51,19 +51,18 @@ Mark ticket as needs_review
 ## Provider Interface
 
 ```php
-interface AiProviderInterface
+interface AiProvider
 {
     public function classifyTicket(array $ticket): array;
     public function draftReply(array $ticket, array $contextChunks): array;
-    public function summarizeTicket(array $ticket): array;
 }
 ```
 
-Implementations: `MistralAiProvider`, `MockAiProvider`
+Implementations: `QwenNvidiaAiProvider`, `MockAiProvider`
 
-**Implemented:** `AiProvider` contract and `MockAiProvider` are implemented in `app/Domain/AiProcessing/`. The queued `ProcessTicketAiJob` dispatches AI work asynchronously.
+**Implemented:** `AiProvider` contract, `QwenNvidiaAiProvider`, and `MockAiProvider` are implemented in `app/Domain/AiProcessing/`. The queued `ProcessTicketAiJob` dispatches AI work asynchronously.
 
 ## JSON Validation
 
-Every Mistral response is validated against the expected schema before saving.
+Every provider response is validated against the expected schema before saving.
 Invalid JSON → mark run failed → retry once → fallback to mock.

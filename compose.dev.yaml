@@ -28,7 +28,7 @@ services:
         COMPOSER_IMAGE: ${COMPOSER_IMAGE}
     volumes:
       - ./apps/api:/var/www/html
-    command: php artisan queue:work redis --sleep=3 --tries=3 --timeout=180
+    command: php artisan queue:work redis --queue=ai,default --sleep=3 --tries=3 --timeout=180
 
   scheduler:
     build:
