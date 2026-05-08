@@ -9,8 +9,20 @@ A multi-tenant AI support triage SaaS. Receives customer tickets, processes them
 The repository now has implemented application foundations:
 
 - `apps/api` is a Laravel 12 API app with Sanctum, role-prefixed auth/workspace/ticket endpoints, policy-backed authorization, and feature tests.
-- `apps/web` is a Next.js 15 App Router app with owner/admin/staff portal flows for login, workspace access, ticket queue/detail workflows, and owner/admin policy management screens.
-- AI pipeline modules (provider integration, `ai_runs`, `ticket_ai_outputs`) are implemented with policy retrieval context support; current default provider is Mistral API with mock available for deterministic fallback and tests; full audit/analytics modules remain pending.
+- `apps/web` is a Next.js 15 App Router app with owner/admin/staff portal flows for login, workspace access, ticket queue/detail workflows, owner/admin policy management screens, and team invitation/member workflows.
+- AI pipeline modules (provider integration, `ai_runs`, `ticket_ai_outputs`) are implemented with policy retrieval context support; current default provider is Mistral API with mock available for deterministic fallback and tests.
+- Team invitation/member management endpoints and workflows are implemented, including invitation lifecycle, exact-email acceptance checks, and owner-safe member governance.
+- Remaining planned modules are audit/analytics and billing mock/provider settings.
+
+## Team Invitation and Member Management APIs
+
+- `GET|POST /api/{owner|admin|staff}/workspaces/{workspace}/invitations` lists or creates workspace invitations. Staff listing is limited to invitations matching the authenticated email.
+- `POST /api/{owner|admin|staff}/workspaces/{workspace}/invitations/{invitation}/revoke` revokes pending invitations when role policy allows.
+- `POST /api/staff/workspaces/{workspace}/invitations/{invitation}/accept` accepts a pending invitation when the authenticated email exactly matches the invite target.
+- `POST /api/staff/workspaces/{workspace}/invitations/{invitation}/decline` declines a pending invitation for the matched invitee.
+- `GET /api/{owner|admin|staff}/workspaces/{workspace}/members` lists workspace members with owner/admin policy controls.
+- `PATCH /api/{owner|admin|staff}/workspaces/{workspace}/members/{member}` updates member roles with owner/admin boundaries.
+- `DELETE /api/{owner|admin|staff}/workspaces/{workspace}/members/{member}` removes members with last-owner protection.
 
 ## Policy Knowledge Base APIs
 

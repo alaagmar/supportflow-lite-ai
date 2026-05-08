@@ -1,6 +1,6 @@
 # SupportFlow Lite AI
 
-> A multi-tenant AI support triage SaaS scaffold with implemented auth/workspace/ticket foundations, built with Laravel, Next.js, and Docker.
+> A multi-tenant AI support triage SaaS with implemented identity/workspace/ticketing, AI pipeline, and policy knowledge workflows, built with Laravel, Next.js, and Docker.
 
 ---
 
@@ -15,7 +15,7 @@ SupportFlow Lite AI is a portfolio-grade system built to demonstrate:
 - **Provider-agnostic AI layer** — Mistral primary, mock fallback, easy to swap
 - **Structured JSON outputs** from the configured provider with full validation
 - **Queue-based processing** with retry logic and dead-letter handling
-- **Complete audit logging** of every AI decision and agent action
+- **Structured lifecycle logging** for policy and AI processing events (full audit module pending)
 
 ## Project Constitution
 
@@ -39,6 +39,12 @@ Implemented now:
 Still pending:
 
 - Audit/analytics, billing mock, and team invitation/member management modules.
+
+Recommended Speckit implementation order for remaining modules:
+
+1. Team invitation and member management
+2. Audit and analytics
+3. Billing mock and provider settings
 
 ### Policy Workflow Notes
 
@@ -178,7 +184,7 @@ docker compose -f compose.yaml -f compose.dev.yaml config --quiet
 
 ---
 
-## Planned AI Pipeline
+## Implemented AI Pipeline
 
 ```txt
 Ticket created

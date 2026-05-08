@@ -1,0 +1,159 @@
+openapi: 3.1.0
+info:
+  title: SupportFlow Team Invitation and Member Management API
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/{portal}/workspaces/{workspace}/invitations:
+    get:
+      summary: List workspace invitations
+      parameters:
+        - $ref: '#/components/parameters/Portal'
+        - $ref: '#/components/parameters/Workspace'
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, accepted, declined, revoked, expired]
+      responses:
+        '200':
+          description: Invitations listed
+    post:
+      summary: Create workspace invitation
+      parameters:
+        - $ref: '#/components/parameters/Portal'
+        - $ref: '#/components/parameters/Workspace'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInvitationRequest'
+      responses:
+        '201':
+          description: Invitation created
+        '422':
+          description: Validation or duplicate invitation error
+
+  /api/{portal}/workspaces/{workspace}/invitations/{invitation}/revoke:
+    post:
+      summary: Revoke pending invitation
+      parameters:
+        - $ref: '#/components/parameters/Portal'
+        - $ref: '#/components/parameters/Workspace'
+        - $ref: '#/components/parameters/Invitation'
+      responses:
+        '200':
+          description: Invitation revoked
+        '404':
+          description: Not found in current workspace scope
+
+  /api/staff/workspaces/{workspace}/invitations/{invitation}/accept:
+    post:
+      summary: Accept invitation with matching email identity
+      parameters:
+        - $ref: '#/components/parameters/Workspace'
+        - $ref: '#/components/parameters/Invitation'
+      responses:
+        '200':
+          description: Invitation accepted and membership created
+        '409':
+          description: Invalid state, expired, revoked, or email mismatch
+
+  /api/staff/workspaces/{workspace}/invitations/{invitation}/decline:
+    post:
+      summary: Decline invitation
+      parameters:
+        - $ref: '#/components/parameters/Workspace'
+        - $ref: '#/components/parameters/Invitation'
+      responses:
+        '200':
+          description: Invitation declined
+
+  /api/{portal}/workspaces/{workspace}/members:
+    get:
+      summary: List workspace members
+      parameters:
+        - $ref: '#/components/parameters/Portal'
+        - $ref: '#/components/parameters/Workspace'
+      responses:
+        '200':
+          description: Members listed
+
+  /api/{portal}/workspaces/{workspace}/members/{member}:
+    patch:
+      summary: Update member role
+      parameters:
+        - $ref: '#/components/parameters/Portal'
+        - $ref: '#/components/parameters/Workspace'
+        - $ref: '#/components/parameters/Member'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMemberRoleRequest'
+      responses:
+        '200':
+          description: Role updated
+        '403':
+          description: Forbidden by role constraints
+    delete:
+      summary: Remove member from workspace
+      parameters:
+        - $ref: '#/components/parameters/Portal'
+        - $ref: '#/components/parameters/Workspace'
+        - $ref: '#/components/parameters/Member'
+      responses:
+        '204':
+          description: Member removed
+        '409':
+          description: Last owner protection triggered
+
+components:
+  parameters:
+    Portal:
+      name: portal
+      in: path
+      required: true
+      schema:
+        type: string
+        enum: [owner, admin, staff]
+    Workspace:
+      name: workspace
+      in: path
+      required: true
+      schema:
+        type: integer
+    Invitation:
+      name: invitation
+      in: path
+      required: true
+      schema:
+        type: integer
+    Member:
+      name: member
+      in: path
+      required: true
+      schema:
+        type: integer
+
+  schemas:
+    CreateInvitationRequest:
+      type: object
+      required: [email, role]
+      properties:
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [admin, agent, viewer]
+    UpdateMemberRoleRequest:
+      type: object
+      required: [role]
+      properties:
+        role:
+          type: string
+          enum: [admin, agent, viewer]

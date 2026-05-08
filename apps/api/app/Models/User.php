@@ -83,4 +83,20 @@ class User extends Authenticatable
     {
         return $this->hasMany(Ticket::class, 'assigned_to');
     }
+
+    /**
+     * @return HasMany<WorkspaceInvitation, $this>
+     */
+    public function sentWorkspaceInvitations(): HasMany
+    {
+        return $this->hasMany(WorkspaceInvitation::class, 'invited_by_user_id');
+    }
+
+    /**
+     * @return HasMany<WorkspaceInvitation, $this>
+     */
+    public function acceptedWorkspaceInvitations(): HasMany
+    {
+        return $this->hasMany(WorkspaceInvitation::class, 'accepted_by_user_id');
+    }
 }

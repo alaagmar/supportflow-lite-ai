@@ -14,8 +14,12 @@ use App\Domain\Workspaces\Contracts\WorkspaceRepository;
 use App\Domain\Workspaces\Repositories\EloquentWorkspaceRepository;
 use App\Models\Ticket;
 use App\Models\Workspace;
+use App\Models\WorkspaceInvitation;
+use App\Models\WorkspaceMember;
 use App\Policies\PolicyDocumentPolicy;
 use App\Policies\TicketPolicy;
+use App\Policies\WorkspaceInvitationPolicy;
+use App\Policies\WorkspaceMemberPolicy;
 use App\Policies\WorkspacePolicy;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -54,6 +58,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Workspace::class, WorkspacePolicy::class);
         Gate::policy(Ticket::class, TicketPolicy::class);
         Gate::policy(PolicyDocument::class, PolicyDocumentPolicy::class);
+        Gate::policy(WorkspaceInvitation::class, WorkspaceInvitationPolicy::class);
+        Gate::policy(WorkspaceMember::class, WorkspaceMemberPolicy::class);
 
         RateLimiter::for('auth-login', function (Request $request): Limit {
             $email = Str::lower((string) $request->input('email', ''));

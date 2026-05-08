@@ -1,22 +1,18 @@
 <!--
 Sync Impact Report
-- Version change: template -> 1.0.0
+- Version change: 1.0.0 -> 1.0.1
 - Modified principles:
-  - Principle slot 1 -> I. Docker-First Execution
-  - Principle slot 2 -> II. Monorepo Boundary Integrity
-  - Principle slot 3 -> III. Tenant Safety And Role Enforcement
-  - Principle slot 4 -> IV. Asynchronous, Validated AI Processing
-  - Principle slot 5 -> V. Minimal Changes, Verified Delivery
+  - None (wording and alignment review only)
 - Added sections:
-  - Implementation Constraints
-  - Delivery Workflow
+  - None
 - Removed sections:
   - None
 - Templates requiring updates:
-  - ✅ .specify/templates/plan-template.md
-  - ✅ .specify/templates/spec-template.md
-  - ✅ .specify/templates/tasks-template.md
-  - ✅ README.md
+  - ✅ .specify/templates/plan-template.md (reviewed, aligned)
+  - ✅ .specify/templates/spec-template.md (reviewed, aligned)
+  - ✅ .specify/templates/tasks-template.md (reviewed, aligned)
+  - ✅ .specify/templates/commands/*.md (not present; no stale command-template references)
+  - ✅ README.md (reviewed, aligned with constitutional principles)
 - Follow-up TODOs:
   - None
 -->
@@ -133,4 +129,4 @@ it before merge, and record any justified exceptions in the implementation plan'
 complexity tracking section. Runtime development guidance lives in `AGENTS.md`
 and `docs/engineering/*.md`.
 
-**Version**: 1.0.0 | **Ratified**: 2026-05-05 | **Last Amended**: 2026-05-05
+**Version**: 1.0.1 | **Ratified**: 2026-05-05 | **Last Amended**: 2026-05-08

@@ -9,7 +9,7 @@ The repository is a Docker-first monorepo:
 - Backend: Laravel 12 API in `apps/api`, Sanctum installed, API routing enabled, PostgreSQL/Redis/Mailpit env defaults.
 - Frontend: Next.js 15 App Router in `apps/web`, TypeScript, Tailwind CSS 4, ESLint, standalone output for Docker production builds.
 - Infrastructure: Docker Compose, PHP-FPM, Nginx, Caddy, PostgreSQL 18, Redis 8, Mailpit, scripts in `infra/`.
-- Current state: Identity, Workspace, and Ticket foundations are implemented with role-prefixed auth/workspace/ticket APIs, workspace membership roles, owner/admin/staff frontend ticket entry points, and backend feature tests. AI processing pipeline with queued jobs, provider abstraction, mock fallback, and frontend review UI are implemented. Policy knowledge base, audit/analytics, billing mock, and team invitation/member management are still pending.
+- Current state: Identity, Workspace, Ticketing, AI processing pipeline, and Policy Knowledge Base are implemented with role-prefixed APIs, workspace membership roles, queued processing, provider abstraction, policy retrieval, and frontend ticket/policy workflows. Remaining planned modules are team invitation/member management, audit/analytics, and billing mock/provider settings.
 
 All development and production workflows are Docker-based. Do not run Composer, npm, Artisan, Next.js, queue workers, or tests directly on the host.
 
@@ -138,8 +138,16 @@ Next.js 15 module guidance:
 
 A change is done only when it solves the requested problem, follows the repo conventions, includes relevant tests or a clear reason tests were not added, runs the available relevant Docker-based verification commands, and reports what changed, what was verified, and what risk remains.
 
+## Remaining Module Order
+
+When planning the remaining product work with Speckit, use this order unless a feature dependency requires otherwise:
+
+1. Team invitation and member management.
+2. Audit and analytics.
+3. Billing mock and provider settings.
+
 <!-- SPECKIT START -->
-For additional context about technologies to be used, project structure,
-shell commands, and other important information, read the current plan:
-`specs/001-policy-knowledge-base/plan.md`
+For additional context about current Speckit work for team invitation/member management,
+project structure, shell commands, and workflows, read the active plan:
+`specs/001-team-invite-management/plan.md`
 <!-- SPECKIT END -->
