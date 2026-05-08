@@ -95,4 +95,12 @@ class Workspace extends Model
     {
         return $this->hasMany(PolicyChunk::class);
     }
+
+    /**
+     * @return HasMany<WorkspaceInvitation, $this>
+     */
+    public function invitations(): HasMany
+    {
+        return $this->hasMany(WorkspaceInvitation::class);
+    }
 }

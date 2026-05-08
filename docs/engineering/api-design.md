@@ -35,7 +35,9 @@ Define how JSON API endpoints should be added to the Laravel API and consumed by
 - Existing auth and workspace endpoints are grouped by role prefix under `/api/owner`, `/api/admin`, and `/api/staff` in `routes/api.php`.
 - Existing `GET /sanctum/csrf-cookie` is provided by Sanctum after `statefulApi()` was enabled.
 - Ticket endpoints are implemented under role prefixes (`/api/owner/...`, `/api/admin/...`, `/api/staff/...`) with workspace-scoped ticket CRUD and status updates.
-- Policy document, AI run, and audit log domain endpoints are still pending.
+- Policy document lifecycle and retrieval endpoints are implemented under role prefixes with workspace-scoped authorization.
+- Ticket AI processing endpoints are implemented (`.../ai/process`, `.../ai-output`) and remain queue-driven behind the domain pipeline.
+- Audit log domain endpoints are still pending.
 
 ## Common Mistakes To Avoid
 

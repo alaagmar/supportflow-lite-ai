@@ -358,6 +358,168 @@ export async function unarchivePolicyDocumentAction(formData: FormData): Promise
   redirect(`/${portal}/workspaces/${workspaceId}/policies/${policyId}`);
 }
 
+export async function createWorkspaceInvitationAction(
+  _state: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const portal = portalFromFormData(formData);
+  const token = await getAuthToken();
+
+  if (!token) {
+    redirect(PORTAL_LOGIN_PATH[portal]);
+  }
+
+  const workspaceId = positiveIntegerFromFormData(formData, "workspace_id");
+
+  if (!workspaceId) {
+    return { message: "Unable to send invitation because workspace context is invalid." };
+  }
+
+  try {
+    await apiRequest(`/api/${portal}/workspaces/${workspaceId}/invitations`, {
+      method: "POST",
+      token,
+      body: JSON.stringify({
+        email: valueOf(formData, "email"),
+        role: valueOf(formData, "role"),
+      }),
+    });
+  } catch (error) {
+    return formError(error);
+  }
+
+  revalidatePath(`/${portal}/workspaces/${workspaceId}/team`);
+
+  return { message: "Invitation sent." };
+}
+
+export async function revokeWorkspaceInvitationAction(formData: FormData): Promise<void> {
+  const portal = portalFromFormData(formData);
+  const token = await getAuthToken();
+
+  if (!token) {
+    redirect(PORTAL_LOGIN_PATH[portal]);
+  }
+
+  const workspaceId = positiveIntegerFromFormData(formData, "workspace_id");
+  const invitationId = positiveIntegerFromFormData(formData, "invitation_id");
+
+  if (!workspaceId || !invitationId) {
+    redirect(`/${portal}/workspaces`);
+  }
+
+  await apiRequest(`/api/${portal}/workspaces/${workspaceId}/invitations/${invitationId}/revoke`, {
+    method: "POST",
+    token,
+  });
+
+  revalidatePath(`/${portal}/workspaces/${workspaceId}/team`);
+  redirect(`/${portal}/workspaces/${workspaceId}/team`);
+}
+
+export async function updateWorkspaceMemberRoleAction(
+  _state: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const portal = portalFromFormData(formData);
+  const token = await getAuthToken();
+
+  if (!token) {
+    redirect(PORTAL_LOGIN_PATH[portal]);
+  }
+
+  const workspaceId = positiveIntegerFromFormData(formData, "workspace_id");
+  const memberId = positiveIntegerFromFormData(formData, "member_id");
+
+  if (!workspaceId || !memberId) {
+    return { message: "Unable to update role because member context is invalid." };
+  }
+
+  try {
+    await apiRequest(`/api/${portal}/workspaces/${workspaceId}/members/${memberId}`, {
+      method: "PATCH",
+      token,
+      body: JSON.stringify({ role: valueOf(formData, "role") }),
+    });
+  } catch (error) {
+    return formError(error);
+  }
+
+  revalidatePath(`/${portal}/workspaces/${workspaceId}/team`);
+
+  return { message: "Member role updated." };
+}
+
+export async function removeWorkspaceMemberAction(formData: FormData): Promise<void> {
+  const portal = portalFromFormData(formData);
+  const token = await getAuthToken();
+
+  if (!token) {
+    redirect(PORTAL_LOGIN_PATH[portal]);
+  }
+
+  const workspaceId = positiveIntegerFromFormData(formData, "workspace_id");
+  const memberId = positiveIntegerFromFormData(formData, "member_id");
+
+  if (!workspaceId || !memberId) {
+    redirect(`/${portal}/workspaces`);
+  }
+
+  await apiRequest(`/api/${portal}/workspaces/${workspaceId}/members/${memberId}`, {
+    method: "DELETE",
+    token,
+  });
+
+  revalidatePath(`/${portal}/workspaces/${workspaceId}/team`);
+  redirect(`/${portal}/workspaces/${workspaceId}/team`);
+}
+
+export async function acceptWorkspaceInvitationAction(formData: FormData): Promise<void> {
+  const token = await getAuthToken();
+
+  if (!token) {
+    redirect("/staff/login");
+  }
+
+  const workspaceId = positiveIntegerFromFormData(formData, "workspace_id");
+  const invitationId = positiveIntegerFromFormData(formData, "invitation_id");
+
+  if (!workspaceId || !invitationId) {
+    redirect("/staff/invitations");
+  }
+
+  await apiRequest(`/api/staff/workspaces/${workspaceId}/invitations/${invitationId}/accept`, {
+    method: "POST",
+    token,
+  });
+
+  revalidatePath("/staff/invitations");
+  redirect("/staff/invitations");
+}
+
+export async function declineWorkspaceInvitationAction(formData: FormData): Promise<void> {
+  const token = await getAuthToken();
+
+  if (!token) {
+    redirect("/staff/login");
+  }
+
+  const workspaceId = positiveIntegerFromFormData(formData, "workspace_id");
+  const invitationId = positiveIntegerFromFormData(formData, "invitation_id");
+
+  if (!workspaceId || !invitationId) {
+    redirect("/staff/invitations");
+  }
+
+  await apiRequest(`/api/staff/workspaces/${workspaceId}/invitations/${invitationId}/decline`, {
+    method: "POST",
+    token,
+  });
+
+  revalidatePath("/staff/invitations");
+  redirect("/staff/invitations");
+}
+
 export async function logoutAction(): Promise<void> {
   const token = await getAuthToken();
   const portal = await getAuthPortal();

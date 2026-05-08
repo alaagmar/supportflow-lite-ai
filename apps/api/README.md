@@ -12,7 +12,12 @@ Laravel 12 API application for SupportFlow Lite AI.
 - Role-prefixed auth/session endpoints for `owner`, `admin`, and `staff` portals.
 - Workspace endpoints with membership role-aware access.
 - Workspace-scoped ticket endpoints (list/create/show/update/status/delete) behind policy checks.
+- Workspace-scoped AI processing endpoints for queueing and viewing ticket AI output.
+- Workspace-scoped policy endpoints for list/create/update/archive/unarchive and staff retrieval.
+- Workspace-scoped team invitation/member endpoints for invite lifecycle and role-safe member management.
 - Feature test coverage for auth, workspace, and ticket API behavior.
+- Feature test coverage for AI processing and policy role/tenant behavior.
+- Feature test coverage for team invitation lifecycle, security, and member-safety behavior.
 - PostgreSQL, Redis, Mailpit, and AI provider defaults in `.env.example`.
 
 ## Database
@@ -85,5 +90,19 @@ The API currently exposes:
 - `GET|POST /api/{portal}/workspaces/{workspace}/tickets` — ticket list/create routes for `owner`, `admin`, and `staff` portals.
 - `GET|PATCH|DELETE /api/{portal}/workspaces/{workspace}/tickets/{ticket}` — ticket detail/update/delete routes for all portals.
 - `PATCH /api/{portal}/workspaces/{workspace}/tickets/{ticket}/status` — ticket status transitions for all portals.
+- `POST /api/{portal}/workspaces/{workspace}/tickets/{ticket}/ai/process` — queue AI processing for permitted roles.
+- `GET /api/{portal}/workspaces/{workspace}/tickets/{ticket}/ai-output` — view AI output for permitted roles.
+- `GET|POST /api/{owner|admin|staff}/workspaces/{workspace}/policies` — policy list routes for all portals and create for owner/admin.
+- `PATCH /api/{owner|admin}/workspaces/{workspace}/policies/{policy}` — update a policy document.
+- `POST /api/{owner|admin}/workspaces/{workspace}/policies/{policy}/archive` — archive a policy document.
+- `POST /api/{owner|admin}/workspaces/{workspace}/policies/{policy}/unarchive` — unarchive a policy document.
+- `POST /api/staff/workspaces/{workspace}/policies/retrieve` — retrieve ranked policy guidance for ticket workflows.
+- `GET|POST /api/{owner|admin|staff}/workspaces/{workspace}/invitations` — invitation list/create routes (staff list is scoped to invitee email).
+- `POST /api/{owner|admin|staff}/workspaces/{workspace}/invitations/{invitation}/revoke` — revoke a pending invitation.
+- `POST /api/staff/workspaces/{workspace}/invitations/{invitation}/accept` — accept invitation (exact email match required).
+- `POST /api/staff/workspaces/{workspace}/invitations/{invitation}/decline` — decline invitation (exact email match required).
+- `GET /api/{owner|admin|staff}/workspaces/{workspace}/members` — list workspace members (owner/admin policy enforced).
+- `PATCH /api/{owner|admin|staff}/workspaces/{workspace}/members/{member}` — update member role with owner/admin constraints.
+- `DELETE /api/{owner|admin|staff}/workspaces/{workspace}/members/{member}` — remove member with last-owner safeguard.
 
-Still pending: policy document routes, AI run routes/pipeline endpoints, and audit/team management endpoints.
+Still pending: audit/analytics and billing/provider settings endpoints.

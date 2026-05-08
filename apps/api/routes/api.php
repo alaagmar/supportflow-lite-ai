@@ -11,6 +11,13 @@ use App\Http\Controllers\Portal\Policies\ListCreatePolicyDocumentController;
 use App\Http\Controllers\Portal\Policies\RetrievePolicyGuidanceController;
 use App\Http\Controllers\Portal\Policies\UnarchivePolicyDocumentController;
 use App\Http\Controllers\Portal\Policies\UpdatePolicyDocumentController;
+use App\Http\Controllers\Portal\Team\AcceptWorkspaceInvitationController;
+use App\Http\Controllers\Portal\Team\DeclineWorkspaceInvitationController;
+use App\Http\Controllers\Portal\Team\ListCreateWorkspaceInvitationController;
+use App\Http\Controllers\Portal\Team\ListWorkspaceMembersController;
+use App\Http\Controllers\Portal\Team\RemoveWorkspaceMemberController;
+use App\Http\Controllers\Portal\Team\RevokeWorkspaceInvitationController;
+use App\Http\Controllers\Portal\Team\UpdateWorkspaceMemberRoleController;
 use App\Http\Controllers\Portal\Tickets\ProcessTicketAiController;
 use App\Http\Controllers\Portal\Tickets\ShowTicketController;
 use App\Http\Controllers\Portal\Tickets\ShowTicketAiOutputController;
@@ -120,11 +127,60 @@ $registerPortalPolicyRoutes = static function (string $portal, string $portalAbi
     }
 };
 
-Route::prefix('owner')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes): void {
+$registerPortalTeamManagementRoutes = static function (string $portal, string $portalAbility): void {
+    Route::get('/workspaces/{workspace}/invitations', ListCreateWorkspaceInvitationController::class)
+        ->whereNumber('workspace')
+        ->defaults('portal', $portal)
+        ->defaults('portal_ability', $portalAbility);
+
+    Route::post('/workspaces/{workspace}/invitations', ListCreateWorkspaceInvitationController::class)
+        ->whereNumber('workspace')
+        ->defaults('portal', $portal)
+        ->defaults('portal_ability', $portalAbility);
+
+    Route::post('/workspaces/{workspace}/invitations/{invitation}/revoke', RevokeWorkspaceInvitationController::class)
+        ->whereNumber('workspace')
+        ->whereNumber('invitation')
+        ->defaults('portal', $portal)
+        ->defaults('portal_ability', $portalAbility);
+
+    Route::get('/workspaces/{workspace}/members', ListWorkspaceMembersController::class)
+        ->whereNumber('workspace')
+        ->defaults('portal', $portal)
+        ->defaults('portal_ability', $portalAbility);
+
+    Route::patch('/workspaces/{workspace}/members/{member}', UpdateWorkspaceMemberRoleController::class)
+        ->whereNumber('workspace')
+        ->whereNumber('member')
+        ->defaults('portal', $portal)
+        ->defaults('portal_ability', $portalAbility);
+
+    Route::delete('/workspaces/{workspace}/members/{member}', RemoveWorkspaceMemberController::class)
+        ->whereNumber('workspace')
+        ->whereNumber('member')
+        ->defaults('portal', $portal)
+        ->defaults('portal_ability', $portalAbility);
+};
+
+$registerInvitationResponseRoutes = static function (): void {
+    Route::post('/workspaces/{workspace}/invitations/{invitation}/accept', AcceptWorkspaceInvitationController::class)
+        ->whereNumber('workspace')
+        ->whereNumber('invitation')
+        ->defaults('portal', Portal::STAFF)
+        ->defaults('portal_ability', 'accessStaffPortal');
+
+    Route::post('/workspaces/{workspace}/invitations/{invitation}/decline', DeclineWorkspaceInvitationController::class)
+        ->whereNumber('workspace')
+        ->whereNumber('invitation')
+        ->defaults('portal', Portal::STAFF)
+        ->defaults('portal_ability', 'accessStaffPortal');
+};
+
+Route::prefix('owner')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes, $registerPortalTeamManagementRoutes): void {
     Route::post('/auth/register', OwnerRegisterController::class)->middleware('throttle:auth-register-owner');
     Route::post('/auth/login', OwnerLoginController::class)->middleware('throttle:auth-login');
 
-    Route::middleware('auth:sanctum')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes): void {
+    Route::middleware('auth:sanctum')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes, $registerPortalTeamManagementRoutes): void {
         Route::get('/auth/me', OwnerCurrentSessionController::class);
         Route::post('/auth/logout', OwnerLogoutController::class);
 
@@ -134,13 +190,14 @@ Route::prefix('owner')->group(function () use ($registerPortalTicketRoutes, $reg
 
         $registerPortalTicketRoutes(Portal::OWNER, 'accessOwnerPortal');
         $registerPortalPolicyRoutes(Portal::OWNER, 'accessOwnerPortal', true, false);
+        $registerPortalTeamManagementRoutes(Portal::OWNER, 'accessOwnerPortal');
     });
 });
 
-Route::prefix('admin')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes): void {
+Route::prefix('admin')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes, $registerPortalTeamManagementRoutes): void {
     Route::post('/auth/login', AdminLoginController::class)->middleware('throttle:auth-login');
 
-    Route::middleware('auth:sanctum')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes): void {
+    Route::middleware('auth:sanctum')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes, $registerPortalTeamManagementRoutes): void {
         Route::get('/auth/me', AdminCurrentSessionController::class);
         Route::post('/auth/logout', AdminLogoutController::class);
 
@@ -149,13 +206,14 @@ Route::prefix('admin')->group(function () use ($registerPortalTicketRoutes, $reg
 
         $registerPortalTicketRoutes(Portal::ADMIN, 'accessAdminPortal');
         $registerPortalPolicyRoutes(Portal::ADMIN, 'accessAdminPortal', true, false);
+        $registerPortalTeamManagementRoutes(Portal::ADMIN, 'accessAdminPortal');
     });
 });
 
-Route::prefix('staff')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes): void {
+Route::prefix('staff')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes, $registerPortalTeamManagementRoutes, $registerInvitationResponseRoutes): void {
     Route::post('/auth/login', StaffLoginController::class)->middleware('throttle:auth-login');
 
-    Route::middleware('auth:sanctum')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes): void {
+    Route::middleware('auth:sanctum')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes, $registerPortalTeamManagementRoutes, $registerInvitationResponseRoutes): void {
         Route::get('/auth/me', StaffCurrentSessionController::class);
         Route::post('/auth/logout', StaffLogoutController::class);
 
@@ -164,5 +222,7 @@ Route::prefix('staff')->group(function () use ($registerPortalTicketRoutes, $reg
 
         $registerPortalTicketRoutes(Portal::STAFF, 'accessStaffPortal');
         $registerPortalPolicyRoutes(Portal::STAFF, 'accessStaffPortal', false, true);
+        $registerPortalTeamManagementRoutes(Portal::STAFF, 'accessStaffPortal');
+        $registerInvitationResponseRoutes();
     });
 });
