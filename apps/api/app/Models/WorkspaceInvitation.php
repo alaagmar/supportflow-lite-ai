@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Database\Factories\WorkspaceInvitationFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class WorkspaceInvitation extends Model
 {
@@ -87,6 +88,14 @@ class WorkspaceInvitation extends Model
     public function acceptedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'accepted_by_user_id');
+    }
+
+    /**
+     * @return HasMany<WorkspaceInvitationActivationToken, $this>
+     */
+    public function activationTokens(): HasMany
+    {
+        return $this->hasMany(WorkspaceInvitationActivationToken::class);
     }
 
     /**

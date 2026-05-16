@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Models\Workspace;
+use App\Models\WorkspaceInvitation;
+use App\Models\WorkspaceInvitationActivationToken;
 use App\Models\WorkspaceMember;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -213,6 +216,84 @@ class AuthApiTest extends TestCase
         $this->withToken($token)
             ->getJson('/api/owner/auth/me')
             ->assertUnauthorized();
+    }
+
+    public function test_staff_login_is_denied_when_activation_is_pending(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'pending-staff@example.test',
+            'password' => 'password-secret',
+        ]);
+        $workspace = Workspace::factory()->create();
+
+        WorkspaceMember::factory()->owner()->create([
+            'workspace_id' => $workspace->id,
+            'user_id' => $user->id,
+        ]);
+
+        $invitation = WorkspaceInvitation::factory()->pending()->create([
+            'workspace_id' => $workspace->id,
+            'invited_email' => $user->email,
+            'invited_by_user_id' => $user->id,
+        ]);
+
+        WorkspaceInvitationActivationToken::factory()->create([
+            'workspace_invitation_id' => $invitation->id,
+            'invited_email' => $user->email,
+        ]);
+
+        $this->postJson('/api/staff/auth/login', [
+            'email' => $user->email,
+            'password' => 'password-secret',
+        ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('email');
+
+        WorkspaceInvitationActivationToken::query()->update(['used_at' => now()]);
+
+        $this->postJson('/api/staff/auth/login', [
+            'email' => $user->email,
+            'password' => 'password-secret',
+        ])->assertOk();
+    }
+
+    public function test_admin_login_is_denied_when_activation_is_pending(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'pending-admin@example.test',
+            'password' => 'password-secret',
+        ]);
+        $workspace = Workspace::factory()->create();
+
+        WorkspaceMember::factory()->admin()->create([
+            'workspace_id' => $workspace->id,
+            'user_id' => $user->id,
+        ]);
+
+        $invitation = WorkspaceInvitation::factory()->pending()->create([
+            'workspace_id' => $workspace->id,
+            'invited_email' => $user->email,
+            'invited_by_user_id' => $user->id,
+        ]);
+
+        WorkspaceInvitationActivationToken::factory()->create([
+            'workspace_invitation_id' => $invitation->id,
+            'invited_email' => $user->email,
+        ]);
+
+        $this->postJson('/api/admin/auth/login', [
+            'email' => $user->email,
+            'password' => 'password-secret',
+        ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('email');
+
+        WorkspaceInvitationActivationToken::query()->update(['used_at' => now()]);
+
+        $this->postJson('/api/admin/auth/login', [
+            'email' => $user->email,
+            'password' => 'password-secret',
+        ])->assertOk();
     }
 
     public function test_login_attempts_are_rate_limited(): void

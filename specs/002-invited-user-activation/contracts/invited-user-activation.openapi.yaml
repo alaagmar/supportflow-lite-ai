@@ -1,0 +1,88 @@
+openapi: 3.1.0
+info:
+  title: SupportFlow Invited User Activation API
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/staff/auth/activation/complete:
+    post:
+      summary: Complete invited-user activation by setting password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivationCompleteRequest'
+      responses:
+        '200':
+          description: Activation completed
+        '409':
+          description: Token invalid, expired, already used, or invitation no longer pending
+        '422':
+          description: Password validation failed
+
+  /api/staff/auth/activation/resend:
+    post:
+      summary: Request replacement activation email for pending invitation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivationResendRequest'
+      responses:
+        '202':
+          description: Resend accepted (generic response to avoid account enumeration)
+        '429':
+          description: Resend limit reached (3 per 24h per invitation)
+
+  /api/staff/auth/login:
+    post:
+      summary: Staff login (behavioral note for pre-activation denial)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StaffLoginRequest'
+      responses:
+        '200':
+          description: Login success
+        '401':
+          description: Login denied (including activation not completed)
+
+components:
+  schemas:
+    ActivationCompleteRequest:
+      type: object
+      required: [token, password, password_confirmation]
+      properties:
+        token:
+          type: string
+          description: Opaque activation token from activation email link
+        password:
+          type: string
+          minLength: 8
+        password_confirmation:
+          type: string
+
+    ActivationResendRequest:
+      type: object
+      required: [email, workspace_id]
+      properties:
+        email:
+          type: string
+          format: email
+        workspace_id:
+          type: integer
+
+    StaffLoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string

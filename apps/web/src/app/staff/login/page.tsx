@@ -4,7 +4,7 @@ import { PortalLoginForm } from "@/components/auth/portal-login-form";
 export default function StaffLoginPage() {
   return (
     <AuthShell
-      description="Agents and viewers can use the staff portal for ticket execution while Laravel enforces workspace role access."
+      description="Agents and viewers can use the staff portal for ticket execution while Laravel enforces workspace role access. If prompted, complete invitation activation from your email first."
       eyebrow="Staff portal"
       title="Enter the operational console for ticket triage."
     >

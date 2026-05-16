@@ -36,6 +36,14 @@ export type CurrentSessionPayload = {
   };
 };
 
+export type ActivationActionPayload = {
+  data: {
+    message: string;
+    /** The portal the user should log in through after activation (based on their invited role). */
+    portal: PortalSlug;
+  };
+};
+
 export type WorkspaceListPayload = {
   data: ApiWorkspace[];
   links?: Record<string, string | null>;
@@ -224,4 +232,64 @@ function serverApiUrl(): string {
     process.env.NEXT_PUBLIC_API_URL ??
     "http://api-nginx"
   ).replace(/\/$/, "");
+}
+
+export async function completeInvitationActivation(
+  token: string,
+  password: string,
+  passwordConfirmation: string,
+): Promise<ActivationActionPayload> {
+  return browserApiRequest<ActivationActionPayload>('/api/staff/auth/activation/complete', {
+    method: 'POST',
+    body: JSON.stringify({
+      token,
+      password,
+      password_confirmation: passwordConfirmation,
+    }),
+  });
+}
+
+export async function resendInvitationActivation(
+  email: string,
+  workspaceId: number,
+): Promise<ActivationActionPayload> {
+  return browserApiRequest<ActivationActionPayload>('/api/staff/auth/activation/resend', {
+    method: 'POST',
+    body: JSON.stringify({
+      email,
+      workspace_id: workspaceId,
+    }),
+  });
+}
+
+async function browserApiRequest<T>(path: string, options: ApiRequestOptions): Promise<T> {
+  const response = await fetch(`${publicApiUrl()}${path}`, {
+    cache: 'no-store',
+    ...options,
+    headers: {
+      Accept: 'application/json',
+      ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+      ...options.headers,
+    },
+  });
+
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  const payload = (await response.json().catch(() => ({}))) as ApiErrorPayload;
+
+  if (!response.ok) {
+    throw new ApiRequestError(
+      response.status,
+      payload.message ?? 'The API request failed.',
+      payload.errors,
+    );
+  }
+
+  return payload as T;
+}
+
+function publicApiUrl(): string {
+  return (process.env.NEXT_PUBLIC_API_URL ?? '').replace(/\/$/, '');
 }

@@ -1,11 +1,18 @@
 <?php
 
+use App\Domain\Identity\Portal;
 use App\Http\Controllers\Admin\Auth\CurrentSessionController as AdminCurrentSessionController;
 use App\Http\Controllers\Admin\Auth\LoginController as AdminLoginController;
 use App\Http\Controllers\Admin\Auth\LogoutController as AdminLogoutController;
-use App\Http\Controllers\Portal\Tickets\CreateTicketController;
-use App\Http\Controllers\Portal\Tickets\DeleteTicketController;
-use App\Http\Controllers\Portal\Tickets\ListTicketsController;
+use App\Http\Controllers\Admin\Workspaces\ListWorkspacesController as AdminListWorkspacesController;
+use App\Http\Controllers\Admin\Workspaces\ShowWorkspaceController as AdminShowWorkspaceController;
+use App\Http\Controllers\Owner\Auth\CurrentSessionController as OwnerCurrentSessionController;
+use App\Http\Controllers\Owner\Auth\LoginController as OwnerLoginController;
+use App\Http\Controllers\Owner\Auth\LogoutController as OwnerLogoutController;
+use App\Http\Controllers\Owner\Auth\RegisterController as OwnerRegisterController;
+use App\Http\Controllers\Owner\Workspaces\CreateWorkspaceController as OwnerCreateWorkspaceController;
+use App\Http\Controllers\Owner\Workspaces\ListWorkspacesController as OwnerListWorkspacesController;
+use App\Http\Controllers\Owner\Workspaces\ShowWorkspaceController as OwnerShowWorkspaceController;
 use App\Http\Controllers\Portal\Policies\ArchivePolicyDocumentController;
 use App\Http\Controllers\Portal\Policies\ListCreatePolicyDocumentController;
 use App\Http\Controllers\Portal\Policies\RetrievePolicyGuidanceController;
@@ -18,24 +25,19 @@ use App\Http\Controllers\Portal\Team\ListWorkspaceMembersController;
 use App\Http\Controllers\Portal\Team\RemoveWorkspaceMemberController;
 use App\Http\Controllers\Portal\Team\RevokeWorkspaceInvitationController;
 use App\Http\Controllers\Portal\Team\UpdateWorkspaceMemberRoleController;
+use App\Http\Controllers\Portal\Tickets\CreateTicketController;
+use App\Http\Controllers\Portal\Tickets\DeleteTicketController;
+use App\Http\Controllers\Portal\Tickets\ListTicketsController;
 use App\Http\Controllers\Portal\Tickets\ProcessTicketAiController;
-use App\Http\Controllers\Portal\Tickets\ShowTicketController;
 use App\Http\Controllers\Portal\Tickets\ShowTicketAiOutputController;
+use App\Http\Controllers\Portal\Tickets\ShowTicketController;
 use App\Http\Controllers\Portal\Tickets\UpdateTicketController;
 use App\Http\Controllers\Portal\Tickets\UpdateTicketStatusController;
-use App\Http\Controllers\Admin\Workspaces\ListWorkspacesController as AdminListWorkspacesController;
-use App\Http\Controllers\Admin\Workspaces\ShowWorkspaceController as AdminShowWorkspaceController;
-use App\Domain\Identity\Portal;
-use App\Http\Controllers\Owner\Auth\CurrentSessionController as OwnerCurrentSessionController;
-use App\Http\Controllers\Owner\Auth\LoginController as OwnerLoginController;
-use App\Http\Controllers\Owner\Auth\LogoutController as OwnerLogoutController;
-use App\Http\Controllers\Owner\Auth\RegisterController as OwnerRegisterController;
-use App\Http\Controllers\Owner\Workspaces\CreateWorkspaceController as OwnerCreateWorkspaceController;
-use App\Http\Controllers\Owner\Workspaces\ListWorkspacesController as OwnerListWorkspacesController;
-use App\Http\Controllers\Owner\Workspaces\ShowWorkspaceController as OwnerShowWorkspaceController;
+use App\Http\Controllers\Staff\Auth\CompleteInvitationActivationController;
 use App\Http\Controllers\Staff\Auth\CurrentSessionController as StaffCurrentSessionController;
 use App\Http\Controllers\Staff\Auth\LoginController as StaffLoginController;
 use App\Http\Controllers\Staff\Auth\LogoutController as StaffLogoutController;
+use App\Http\Controllers\Staff\Auth\ResendInvitationActivationController;
 use App\Http\Controllers\Staff\Workspaces\ListWorkspacesController as StaffListWorkspacesController;
 use App\Http\Controllers\Staff\Workspaces\ShowWorkspaceController as StaffShowWorkspaceController;
 use Illuminate\Support\Facades\Route;
@@ -212,6 +214,8 @@ Route::prefix('admin')->group(function () use ($registerPortalTicketRoutes, $reg
 
 Route::prefix('staff')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes, $registerPortalTeamManagementRoutes, $registerInvitationResponseRoutes): void {
     Route::post('/auth/login', StaffLoginController::class)->middleware('throttle:auth-login');
+    Route::post('/auth/activation/complete', CompleteInvitationActivationController::class);
+    Route::post('/auth/activation/resend', ResendInvitationActivationController::class);
 
     Route::middleware('auth:sanctum')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes, $registerPortalTeamManagementRoutes, $registerInvitationResponseRoutes): void {
         Route::get('/auth/me', StaffCurrentSessionController::class);
