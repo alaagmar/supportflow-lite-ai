@@ -78,6 +78,14 @@ export default async function AdminWorkspacesPage() {
 }
 
 function WorkspaceCard({ workspace }: { workspace: ApiWorkspace }) {
+  const workspaceActions = [
+    { href: `/admin/workspaces/${workspace.id}/tickets`, label: "Open ticket queue" },
+    { href: `/admin/workspaces/${workspace.id}/policies`, label: "Open knowledge base" },
+    { href: `/admin/workspaces/${workspace.id}/team`, label: "Open team management" },
+    { href: `/admin/workspaces/${workspace.id}/analytics`, label: "Open analytics" },
+    { href: `/admin/workspaces/${workspace.id}/audit-logs`, label: "Open audit logs" },
+  ];
+
   return (
     <article className="rounded-2xl border border-white/10 bg-slate-950/70 p-5 transition hover:border-cyan-300/30">
       <div className="flex items-start justify-between gap-4">
@@ -90,12 +98,24 @@ function WorkspaceCard({ workspace }: { workspace: ApiWorkspace }) {
         </span>
       </div>
 
-      <Link
-        className="mt-5 inline-flex rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:border-cyan-300/30 hover:bg-cyan-300/10"
-        href={`/admin/workspaces/${workspace.id}/tickets`}
-      >
-        Open ticket queue
-      </Link>
+      <p className="mt-4 text-sm text-slate-400">
+        {workspace.role === "owner"
+          ? "Owner access in admin portal: manage operations, policies, team, and reporting."
+          : "Admin access: manage operations, policies, team, and reporting."
+        }
+      </p>
+
+      <div className="mt-5 flex flex-wrap gap-2">
+        {workspaceActions.map((action) => (
+          <Link
+            className="inline-flex rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:border-cyan-300/30 hover:bg-cyan-300/10"
+            href={action.href}
+            key={action.href}
+          >
+            {action.label}
+          </Link>
+        ))}
+      </div>
     </article>
   );
 }

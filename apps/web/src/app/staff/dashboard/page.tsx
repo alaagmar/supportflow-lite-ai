@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { logoutAction } from "@/app/actions";
-import { apiRequest, ApiRequestError, type CurrentSessionPayload } from "@/lib/api";
+import { apiRequest, ApiRequestError, type CurrentSessionPayload, type WorkspaceRole } from "@/lib/api";
 import { getAuthToken } from "@/lib/session";
 
 export default async function StaffDashboardPage() {
@@ -61,6 +61,9 @@ export default async function StaffDashboardPage() {
               {staffWorkspaces.length > 0 ? (
                 staffWorkspaces.map((workspace) => (
                   <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4" key={workspace.id}>
+                    <p className="mb-3 text-xs uppercase tracking-[0.2em] text-slate-500">
+                      {roleSummary(workspace.role)}
+                    </p>
                     <div className="flex items-center justify-between gap-3">
                       <div>
                         <p className="font-medium text-white">{workspace.name}</p>
@@ -70,12 +73,18 @@ export default async function StaffDashboardPage() {
                         {workspace.role}
                       </span>
                     </div>
-                    <Link
-                      className="mt-3 inline-flex rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:border-cyan-300/30 hover:bg-cyan-300/10"
-                      href={`/staff/workspaces/${workspace.id}/tickets`}
-                    >
-                      Open ticket queue
-                    </Link>
+
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {workspaceActions(workspace.id, workspace.role).map((action) => (
+                        <Link
+                          className="inline-flex rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:border-cyan-300/30 hover:bg-cyan-300/10"
+                          href={action.href}
+                          key={action.href}
+                        >
+                          {action.label}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 ))
               ) : (
@@ -88,10 +97,10 @@ export default async function StaffDashboardPage() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             {[
-              ["Queue triage", "Review new tickets and assign ownership."],
-              ["AI drafts", "Approve, edit, or reject generated replies."],
-              ["Policy evidence", "Inspect retrieval snippets before sending."],
-              ["Audit trail", "Track role actions and AI processing history."],
+              ["Owner", "Full workspace access in staff views, with ticket operations and reporting links."],
+              ["Admin", "Operational ownership across queue, assignment decisions, and reporting links."],
+              ["Agent", "Ticket execution and AI review actions, without audit or analytics access."],
+              ["Viewer", "Read-only ticket access plus audit and analytics visibility."],
             ].map(([title, detail]) => (
               <article className="rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-5" key={title}>
                 <div className="mb-5 h-10 w-10 rounded-2xl bg-cyan-300/10 ring-1 ring-cyan-300/20" />
@@ -104,4 +113,42 @@ export default async function StaffDashboardPage() {
       </div>
     </main>
   );
+}
+
+function roleSummary(role?: WorkspaceRole): string {
+  if (role === "owner") {
+    return "Owner permissions";
+  }
+
+  if (role === "admin") {
+    return "Admin permissions";
+  }
+
+  if (role === "agent") {
+    return "Agent permissions";
+  }
+
+  return "Viewer permissions";
+}
+
+function workspaceActions(workspaceId: number, role?: WorkspaceRole): Array<{ href: string; label: string }> {
+  if (role === "agent") {
+    return [
+      { href: `/staff/workspaces/${workspaceId}/tickets`, label: "Open ticket queue" },
+    ];
+  }
+
+  if (role === "viewer") {
+    return [
+      { href: `/staff/workspaces/${workspaceId}/tickets`, label: "View ticket queue" },
+      { href: `/staff/workspaces/${workspaceId}/analytics`, label: "View analytics" },
+      { href: `/staff/workspaces/${workspaceId}/audit-logs`, label: "View audit logs" },
+    ];
+  }
+
+  return [
+    { href: `/staff/workspaces/${workspaceId}/tickets`, label: "Open ticket queue" },
+    { href: `/staff/workspaces/${workspaceId}/analytics`, label: "Open analytics" },
+    { href: `/staff/workspaces/${workspaceId}/audit-logs`, label: "Open audit logs" },
+  ];
 }
