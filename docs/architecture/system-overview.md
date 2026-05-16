@@ -12,7 +12,16 @@ The repository now has implemented application foundations:
 - `apps/web` is a Next.js 15 App Router app with owner/admin/staff portal flows for login, workspace access, ticket queue/detail workflows, owner/admin policy management screens, and team invitation/member workflows.
 - AI pipeline modules (provider integration, `ai_runs`, `ticket_ai_outputs`) are implemented with policy retrieval context support; current default provider is Mistral API with mock available for deterministic fallback and tests.
 - Team invitation/member management endpoints and workflows are implemented, including invitation lifecycle, exact-email acceptance checks, and owner-safe member governance.
-- Remaining planned modules are audit/analytics and billing mock/provider settings.
+- Audit and analytics module is now implemented with role-safe read APIs and UI workflows for workspace timeline and operational summary views.
+- Remaining planned module is billing mock/provider settings.
+
+## Audit and Analytics APIs
+
+- `GET /api/{owner|admin|staff}/workspaces/{workspace}/audit-logs` returns paginated workspace audit timeline records with optional date/action/actor filtering.
+- `GET /api/{owner|admin|staff}/workspaces/{workspace}/tickets/{ticket}/audit-logs` returns ticket-specific audit timeline records.
+- `GET /api/{owner|admin|staff}/workspaces/{workspace}/analytics/summary` returns workspace-level operational summary metrics over a selected date window.
+- Staff portal audit/analytics access is limited to owner/admin/viewer memberships; agent access is denied.
+- Audit metadata is constrained to safe operational identifiers/status context, and source records are retained for 12 months by module policy.
 
 ## Team Invitation and Member Management APIs
 

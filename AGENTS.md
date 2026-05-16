@@ -9,7 +9,7 @@ The repository is a Docker-first monorepo:
 - Backend: Laravel 12 API in `apps/api`, Sanctum installed, API routing enabled, PostgreSQL/Redis/Mailpit env defaults.
 - Frontend: Next.js 15 App Router in `apps/web`, TypeScript, Tailwind CSS 4, ESLint, standalone output for Docker production builds.
 - Infrastructure: Docker Compose, PHP-FPM, Nginx, Caddy, PostgreSQL 18, Redis 8, Mailpit, scripts in `infra/`.
-- Current state: Identity, Workspace, Ticketing, AI processing pipeline, and Policy Knowledge Base are implemented with role-prefixed APIs, workspace membership roles, queued processing, provider abstraction, policy retrieval, and frontend ticket/policy workflows. Remaining planned modules are team invitation/member management, audit/analytics, and billing mock/provider settings.
+- Current state: Identity, Workspace, Ticketing, AI processing pipeline, Policy Knowledge Base, Team invitation/member management, invited-user activation, and Audit/Analytics are implemented with role-prefixed APIs, workspace membership roles, queued processing, provider abstraction, policy retrieval, and frontend portal workflows. Remaining planned module is billing mock/provider settings.
 
 All development and production workflows are Docker-based. Do not run Composer, npm, Artisan, Next.js, queue workers, or tests directly on the host.
 
@@ -140,14 +140,12 @@ A change is done only when it solves the requested problem, follows the repo con
 
 ## Remaining Module Order
 
-When planning the remaining product work with Speckit, use this order unless a feature dependency requires otherwise:
+When planning remaining product work with Speckit, continue with:
 
-1. Team invitation and member management.
-2. Audit and analytics.
-3. Billing mock and provider settings.
+1. Billing mock and provider settings.
 
 <!-- SPECKIT START -->
-For additional context about current Speckit work for invited user activation,
+For additional context about current Speckit work for audit and analytics,
 project structure, shell commands, and workflows, read the active plan:
-`specs/002-invited-user-activation/plan.md`
+`specs/003-audit-analytics/plan.md`
 <!-- SPECKIT END -->

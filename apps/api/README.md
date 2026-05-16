@@ -15,9 +15,12 @@ Laravel 12 API application for SupportFlow Lite AI.
 - Workspace-scoped AI processing endpoints for queueing and viewing ticket AI output.
 - Workspace-scoped policy endpoints for list/create/update/archive/unarchive and staff retrieval.
 - Workspace-scoped team invitation/member endpoints for invite lifecycle and role-safe member management.
+- Workspace-scoped audit timeline endpoints for workspace and ticket event history.
+- Workspace-scoped analytics summary endpoint with date-window filtering.
 - Feature test coverage for auth, workspace, and ticket API behavior.
 - Feature test coverage for AI processing and policy role/tenant behavior.
 - Feature test coverage for team invitation lifecycle, security, and member-safety behavior.
+- Feature test coverage for audit timeline behavior, analytics summary behavior, and audit/analytics role and tenant boundaries.
 - PostgreSQL, Redis, Mailpit, and AI provider defaults in `.env.example`.
 
 ## Database
@@ -104,5 +107,8 @@ The API currently exposes:
 - `GET /api/{owner|admin|staff}/workspaces/{workspace}/members` — list workspace members (owner/admin policy enforced).
 - `PATCH /api/{owner|admin|staff}/workspaces/{workspace}/members/{member}` — update member role with owner/admin constraints.
 - `DELETE /api/{owner|admin|staff}/workspaces/{workspace}/members/{member}` — remove member with last-owner safeguard.
+- `GET /api/{owner|admin|staff}/workspaces/{workspace}/audit-logs` — list workspace audit timeline events with optional filtering.
+- `GET /api/{owner|admin|staff}/workspaces/{workspace}/tickets/{ticket}/audit-logs` — list ticket-specific audit timeline events.
+- `GET /api/{owner|admin|staff}/workspaces/{workspace}/analytics/summary` — retrieve workspace operational summary metrics for a date window.
 
-Still pending: audit/analytics and billing/provider settings endpoints.
+Still pending: billing/provider settings endpoints.

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Domain\Identity\Contracts\UserRepository;
 use App\Domain\Identity\Repositories\EloquentUserRepository;
+use App\Models\AuditLog;
 use App\Models\PolicyDocument;
 use App\Domain\AiProcessing\Contracts\AiProvider;
 use App\Domain\AiProcessing\Providers\MistralAiProvider;
@@ -17,6 +18,7 @@ use App\Models\Workspace;
 use App\Models\WorkspaceInvitation;
 use App\Models\WorkspaceMember;
 use App\Policies\PolicyDocumentPolicy;
+use App\Policies\AuditAnalyticsPolicy;
 use App\Policies\TicketPolicy;
 use App\Policies\WorkspaceInvitationPolicy;
 use App\Policies\WorkspaceMemberPolicy;
@@ -57,6 +59,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(Workspace::class, WorkspacePolicy::class);
         Gate::policy(Ticket::class, TicketPolicy::class);
+        Gate::policy(AuditLog::class, AuditAnalyticsPolicy::class);
         Gate::policy(PolicyDocument::class, PolicyDocumentPolicy::class);
         Gate::policy(WorkspaceInvitation::class, WorkspaceInvitationPolicy::class);
         Gate::policy(WorkspaceMember::class, WorkspaceMemberPolicy::class);

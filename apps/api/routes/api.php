@@ -18,6 +18,9 @@ use App\Http\Controllers\Portal\Policies\ListCreatePolicyDocumentController;
 use App\Http\Controllers\Portal\Policies\RetrievePolicyGuidanceController;
 use App\Http\Controllers\Portal\Policies\UnarchivePolicyDocumentController;
 use App\Http\Controllers\Portal\Policies\UpdatePolicyDocumentController;
+use App\Http\Controllers\Portal\AuditAnalytics\GetWorkspaceAnalyticsSummaryController;
+use App\Http\Controllers\Portal\AuditAnalytics\ListTicketAuditLogsController;
+use App\Http\Controllers\Portal\AuditAnalytics\ListWorkspaceAuditLogsController;
 use App\Http\Controllers\Portal\Team\AcceptWorkspaceInvitationController;
 use App\Http\Controllers\Portal\Team\DeclineWorkspaceInvitationController;
 use App\Http\Controllers\Portal\Team\ListCreateWorkspaceInvitationController;
@@ -178,11 +181,29 @@ $registerInvitationResponseRoutes = static function (): void {
         ->defaults('portal_ability', 'accessStaffPortal');
 };
 
-Route::prefix('owner')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes, $registerPortalTeamManagementRoutes): void {
+$registerPortalAuditAnalyticsRoutes = static function (string $portal, string $portalAbility): void {
+    Route::get('/workspaces/{workspace}/audit-logs', ListWorkspaceAuditLogsController::class)
+        ->whereNumber('workspace')
+        ->defaults('portal', $portal)
+        ->defaults('portal_ability', $portalAbility);
+
+    Route::get('/workspaces/{workspace}/tickets/{ticket}/audit-logs', ListTicketAuditLogsController::class)
+        ->whereNumber('workspace')
+        ->whereNumber('ticket')
+        ->defaults('portal', $portal)
+        ->defaults('portal_ability', $portalAbility);
+
+    Route::get('/workspaces/{workspace}/analytics/summary', GetWorkspaceAnalyticsSummaryController::class)
+        ->whereNumber('workspace')
+        ->defaults('portal', $portal)
+        ->defaults('portal_ability', $portalAbility);
+};
+
+Route::prefix('owner')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes, $registerPortalTeamManagementRoutes, $registerPortalAuditAnalyticsRoutes): void {
     Route::post('/auth/register', OwnerRegisterController::class)->middleware('throttle:auth-register-owner');
     Route::post('/auth/login', OwnerLoginController::class)->middleware('throttle:auth-login');
 
-    Route::middleware('auth:sanctum')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes, $registerPortalTeamManagementRoutes): void {
+    Route::middleware('auth:sanctum')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes, $registerPortalTeamManagementRoutes, $registerPortalAuditAnalyticsRoutes): void {
         Route::get('/auth/me', OwnerCurrentSessionController::class);
         Route::post('/auth/logout', OwnerLogoutController::class);
 
@@ -193,13 +214,14 @@ Route::prefix('owner')->group(function () use ($registerPortalTicketRoutes, $reg
         $registerPortalTicketRoutes(Portal::OWNER, 'accessOwnerPortal');
         $registerPortalPolicyRoutes(Portal::OWNER, 'accessOwnerPortal', true, false);
         $registerPortalTeamManagementRoutes(Portal::OWNER, 'accessOwnerPortal');
+        $registerPortalAuditAnalyticsRoutes(Portal::OWNER, 'accessOwnerPortal');
     });
 });
 
-Route::prefix('admin')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes, $registerPortalTeamManagementRoutes): void {
+Route::prefix('admin')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes, $registerPortalTeamManagementRoutes, $registerPortalAuditAnalyticsRoutes): void {
     Route::post('/auth/login', AdminLoginController::class)->middleware('throttle:auth-login');
 
-    Route::middleware('auth:sanctum')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes, $registerPortalTeamManagementRoutes): void {
+    Route::middleware('auth:sanctum')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes, $registerPortalTeamManagementRoutes, $registerPortalAuditAnalyticsRoutes): void {
         Route::get('/auth/me', AdminCurrentSessionController::class);
         Route::post('/auth/logout', AdminLogoutController::class);
 
@@ -209,15 +231,16 @@ Route::prefix('admin')->group(function () use ($registerPortalTicketRoutes, $reg
         $registerPortalTicketRoutes(Portal::ADMIN, 'accessAdminPortal');
         $registerPortalPolicyRoutes(Portal::ADMIN, 'accessAdminPortal', true, false);
         $registerPortalTeamManagementRoutes(Portal::ADMIN, 'accessAdminPortal');
+        $registerPortalAuditAnalyticsRoutes(Portal::ADMIN, 'accessAdminPortal');
     });
 });
 
-Route::prefix('staff')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes, $registerPortalTeamManagementRoutes, $registerInvitationResponseRoutes): void {
+Route::prefix('staff')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes, $registerPortalTeamManagementRoutes, $registerInvitationResponseRoutes, $registerPortalAuditAnalyticsRoutes): void {
     Route::post('/auth/login', StaffLoginController::class)->middleware('throttle:auth-login');
     Route::post('/auth/activation/complete', CompleteInvitationActivationController::class);
     Route::post('/auth/activation/resend', ResendInvitationActivationController::class);
 
-    Route::middleware('auth:sanctum')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes, $registerPortalTeamManagementRoutes, $registerInvitationResponseRoutes): void {
+    Route::middleware('auth:sanctum')->group(function () use ($registerPortalTicketRoutes, $registerPortalPolicyRoutes, $registerPortalTeamManagementRoutes, $registerInvitationResponseRoutes, $registerPortalAuditAnalyticsRoutes): void {
         Route::get('/auth/me', StaffCurrentSessionController::class);
         Route::post('/auth/logout', StaffLogoutController::class);
 
@@ -228,5 +251,6 @@ Route::prefix('staff')->group(function () use ($registerPortalTicketRoutes, $reg
         $registerPortalPolicyRoutes(Portal::STAFF, 'accessStaffPortal', false, true);
         $registerPortalTeamManagementRoutes(Portal::STAFF, 'accessStaffPortal');
         $registerInvitationResponseRoutes();
+        $registerPortalAuditAnalyticsRoutes(Portal::STAFF, 'accessStaffPortal');
     });
 });

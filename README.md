@@ -15,7 +15,7 @@ SupportFlow Lite AI is a portfolio-grade system built to demonstrate:
 - **Provider-agnostic AI layer** — Mistral primary, mock fallback, easy to swap
 - **Structured JSON outputs** from the configured provider with full validation
 - **Queue-based processing** with retry logic and dead-letter handling
-- **Structured lifecycle logging** for policy and AI processing events (full audit module pending)
+- **Structured audit timeline and analytics summaries** with role-safe, tenant-scoped visibility
 
 ## Project Constitution
 
@@ -33,18 +33,19 @@ Implemented now:
 
 - `apps/api` — role-prefixed auth/session APIs (`owner`, `admin`, `staff`), workspace membership APIs, workspace-scoped ticket APIs (list/create/show/update/status/delete), and AI processing pipeline with queued jobs, provider interface, and mock fallback.
 - `apps/api` — policy knowledge base APIs for policy document lifecycle (list/create/update/archive/unarchive), chunk retrieval, workspace-scoped authorization, and policy-focused feature tests.
+- `apps/api` — team invitation/member management APIs (invite/revoke/accept/decline, member role update/remove, owner safety guards) and invited-user activation flow.
+- `apps/api` — audit timeline APIs (workspace and ticket-level) and analytics summary APIs with role matrix + tenant isolation enforcement.
 - `apps/web` — owner/admin/staff login flows, workspace dashboards, role-aware ticket queue/detail pages, AI review UI with classification results and policy evidence, and owner/admin policy management screens.
+- `apps/web` — owner/admin/staff team management screens plus owner/admin/staff audit timeline and analytics summary pages.
 - `infra` — Docker-first dev/prod runtime for API, worker, scheduler, web, PostgreSQL, Redis, Caddy, and Mailpit.
 
 Still pending:
 
-- Audit/analytics, billing mock, and team invitation/member management modules.
+- Billing mock and provider settings module.
 
 Recommended Speckit implementation order for remaining modules:
 
-1. Team invitation and member management
-2. Audit and analytics
-3. Billing mock and provider settings
+1. Billing mock and provider settings
 
 ### Policy Workflow Notes
 

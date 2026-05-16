@@ -103,4 +103,12 @@ class Workspace extends Model
     {
         return $this->hasMany(WorkspaceInvitation::class);
     }
+
+    /**
+     * @return HasMany<AuditLog, $this>
+     */
+    public function auditLogs(): HasMany
+    {
+        return $this->hasMany(AuditLog::class);
+    }
 }
