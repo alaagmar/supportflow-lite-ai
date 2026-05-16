@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { logoutAction } from "@/app/actions";
+import { AppShell } from "@/components/ui/app-shell";
+import { SectionHeader } from "@/components/ui/section-header";
+import { ui } from "@/components/ui/styles";
 import {
   apiRequest,
   ApiRequestError,
@@ -40,40 +43,32 @@ export default async function AdminWorkspacesPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.18),transparent_34%),linear-gradient(135deg,#020617,#0f172a_50%,#020617)] px-6 py-8 text-white sm:px-10 lg:px-16">
-      <div className="mx-auto max-w-6xl">
-        <header className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-100">Admin console</p>
-            <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">Workspaces</h1>
-            <p className="mt-3 text-sm text-slate-400">Signed in as {session.data.user.email}</p>
-          </div>
-          <form action={logoutAction}>
-            <button className="rounded-2xl border border-white/10 bg-white/[0.05] px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/[0.1]" type="submit">
-              Sign out
-            </button>
-          </form>
-        </header>
+    <AppShell
+      actions={(
+        <form action={logoutAction}>
+          <button className={ui.buttonSecondary} type="submit">
+            Sign out
+          </button>
+        </form>
+      )}
+      description={`Signed in as ${session.data.user.email}`}
+      eyebrow="Admin console"
+      title="Workspaces"
+    >
+      <section className={ui.sectionCard}>
+        <SectionHeader
+          eyebrow="Operational scope"
+          meta={`${adminWorkspaces.length} workspace${adminWorkspaces.length === 1 ? "" : "s"}`}
+          title="Admin-access workspaces"
+        />
 
-        <section className="rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-cyan-950/20">
-          <div className="flex flex-col justify-between gap-4 border-b border-white/10 pb-5 sm:flex-row sm:items-end">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-100">Operational scope</p>
-              <h2 className="mt-3 text-2xl font-semibold text-white">Admin-access workspaces</h2>
-            </div>
-            <p className="text-sm text-slate-400">
-              {adminWorkspaces.length} workspace{adminWorkspaces.length === 1 ? "" : "s"}
-            </p>
-          </div>
-
-          <div className="mt-5 grid gap-4 md:grid-cols-2">
-            {adminWorkspaces.map((workspace) => (
-              <WorkspaceCard key={workspace.id} workspace={workspace} />
-            ))}
-          </div>
-        </section>
-      </div>
-    </main>
+        <div className="mt-5 grid gap-4 md:grid-cols-2">
+          {adminWorkspaces.map((workspace) => (
+            <WorkspaceCard key={workspace.id} workspace={workspace} />
+          ))}
+        </div>
+      </section>
+    </AppShell>
   );
 }
 
@@ -87,18 +82,18 @@ function WorkspaceCard({ workspace }: { workspace: ApiWorkspace }) {
   ];
 
   return (
-    <article className="rounded-2xl border border-white/10 bg-slate-950/70 p-5 transition hover:border-cyan-300/30">
+    <article className="panel-muted transition duration-200 hover:border-cyan-300/35 p-4">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 className="text-lg font-semibold text-white">{workspace.name}</h3>
-          <p className="mt-1 text-sm text-slate-400">/{workspace.slug}</p>
+          <p className="text-muted mt-1 text-sm">/{workspace.slug}</p>
         </div>
-        <span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs font-medium text-cyan-100">
+        <span className={ui.badge}>
           {workspace.role}
         </span>
       </div>
 
-      <p className="mt-4 text-sm text-slate-400">
+      <p className="text-muted mt-4 text-sm">
         {workspace.role === "owner"
           ? "Owner access in admin portal: manage operations, policies, team, and reporting."
           : "Admin access: manage operations, policies, team, and reporting."
@@ -108,7 +103,7 @@ function WorkspaceCard({ workspace }: { workspace: ApiWorkspace }) {
       <div className="mt-5 flex flex-wrap gap-2">
         {workspaceActions.map((action) => (
           <Link
-            className="inline-flex rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:border-cyan-300/30 hover:bg-cyan-300/10"
+            className="inline-flex rounded-lg border border-white/15 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:border-cyan-300/30 hover:bg-cyan-300/10"
             href={action.href}
             key={action.href}
           >

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { logoutAction } from "@/app/actions";
+import { AppShell } from "@/components/ui/app-shell";
 import { AuditAnalyticsAccessGuard } from "@/features/audit-analytics/components/AuditAnalyticsAccessGuard";
 import { AnalyticsSummaryCards } from "@/features/audit-analytics/components/AnalyticsSummaryCards";
 import { AnalyticsWindowSelector } from "@/features/audit-analytics/components/AnalyticsWindowSelector";
@@ -17,6 +18,7 @@ import {
   listWorkspaceAuditLogs,
 } from "@/lib/api/audit-analytics";
 import { getAuthToken } from "@/lib/session";
+import { ui } from "@/components/ui/styles";
 
 type PageParams = {
   workspaceId: string;
@@ -95,40 +97,30 @@ export async function PortalAuditLogsPage({ portal, params, searchParams }: Port
     : { data: [] };
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.2),transparent_30%),linear-gradient(135deg,#020617,#111827_46%,#020617)] px-6 py-8 text-white sm:px-10 lg:px-16">
-      <div className="mx-auto max-w-6xl">
-        <header className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-100">{view.eyebrow}</p>
-            <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">{workspace.name} audit logs</h1>
-            <p className="mt-3 text-sm text-slate-400">Signed in as {session.data.user.email}</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link
-              className="rounded-2xl border border-white/10 bg-white/[0.05] px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/[0.1]"
-              href={view.backHref}
-            >
-              {view.backLabel}
-            </Link>
-            <form action={logoutAction}>
-              <button
-                className="rounded-2xl border border-white/10 bg-white/[0.05] px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/[0.1]"
-                type="submit"
-              >
-                Sign out
-              </button>
-            </form>
-          </div>
-        </header>
-
-        <section className="space-y-5 rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-cyan-950/20">
-          <AuditAnalyticsAccessGuard role={workspace.role}>
-            <AuditTimelineFilters action={action} actorUserId={actorUserId} endAt={endAt} startAt={startAt} />
-            <AuditTimelineTable entries={timeline.data} />
-          </AuditAnalyticsAccessGuard>
-        </section>
-      </div>
-    </main>
+    <AppShell
+      actions={(
+        <>
+          <Link className={ui.buttonSecondary} href={view.backHref}>
+            {view.backLabel}
+          </Link>
+          <form action={logoutAction}>
+            <button className={ui.buttonSecondary} type="submit">
+              Sign out
+            </button>
+          </form>
+        </>
+      )}
+      description={`Signed in as ${session.data.user.email}`}
+      eyebrow={view.eyebrow}
+      title={`${workspace.name} audit logs`}
+    >
+      <section className={`${ui.sectionCard} space-y-5`}>
+        <AuditAnalyticsAccessGuard role={workspace.role}>
+          <AuditTimelineFilters action={action} actorUserId={actorUserId} endAt={endAt} startAt={startAt} />
+          <AuditTimelineTable entries={timeline.data} />
+        </AuditAnalyticsAccessGuard>
+      </section>
+    </AppShell>
   );
 }
 
@@ -160,40 +152,30 @@ export async function PortalAnalyticsSummaryPage({ portal, params, searchParams 
     : null;
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.2),transparent_30%),linear-gradient(135deg,#020617,#111827_46%,#020617)] px-6 py-8 text-white sm:px-10 lg:px-16">
-      <div className="mx-auto max-w-6xl">
-        <header className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-100">{view.eyebrow}</p>
-            <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">{workspace.name} analytics</h1>
-            <p className="mt-3 text-sm text-slate-400">Signed in as {session.data.user.email}</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link
-              className="rounded-2xl border border-white/10 bg-white/[0.05] px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/[0.1]"
-              href={view.backHref}
-            >
-              {view.backLabel}
-            </Link>
-            <form action={logoutAction}>
-              <button
-                className="rounded-2xl border border-white/10 bg-white/[0.05] px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/[0.1]"
-                type="submit"
-              >
-                Sign out
-              </button>
-            </form>
-          </div>
-        </header>
-
-        <section className="space-y-5 rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-cyan-950/20">
-          <AuditAnalyticsAccessGuard role={workspace.role}>
-            <AnalyticsWindowSelector endAt={endAt} startAt={startAt} />
-            {summary ? <AnalyticsSummaryCards summary={summary.data} /> : null}
-          </AuditAnalyticsAccessGuard>
-        </section>
-      </div>
-    </main>
+    <AppShell
+      actions={(
+        <>
+          <Link className={ui.buttonSecondary} href={view.backHref}>
+            {view.backLabel}
+          </Link>
+          <form action={logoutAction}>
+            <button className={ui.buttonSecondary} type="submit">
+              Sign out
+            </button>
+          </form>
+        </>
+      )}
+      description={`Signed in as ${session.data.user.email}`}
+      eyebrow={view.eyebrow}
+      title={`${workspace.name} analytics`}
+    >
+      <section className={`${ui.sectionCard} space-y-5`}>
+        <AuditAnalyticsAccessGuard role={workspace.role}>
+          <AnalyticsWindowSelector endAt={endAt} startAt={startAt} />
+          {summary ? <AnalyticsSummaryCards summary={summary.data} /> : null}
+        </AuditAnalyticsAccessGuard>
+      </section>
+    </AppShell>
   );
 }
 

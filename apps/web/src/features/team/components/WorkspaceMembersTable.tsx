@@ -6,6 +6,9 @@ import {
   updateWorkspaceMemberRoleAction,
   type FormState,
 } from "@/app/actions";
+import { DataTable } from "@/components/ui/data-table";
+import { EmptyState } from "@/components/ui/empty-state";
+import { ui } from "@/components/ui/styles";
 import type { PortalSlug } from "@/lib/api";
 import type { WorkspaceMemberRecord } from "@/features/team/types";
 
@@ -22,16 +25,14 @@ export function WorkspaceMembersTable({ portal, workspaceId, members }: Workspac
 
   if (members.length === 0) {
     return (
-      <p className="rounded-2xl border border-dashed border-white/10 bg-slate-950/50 p-4 text-sm text-slate-400">
-        No members found for this workspace.
-      </p>
+      <EmptyState description="Invite teammates to start collaborating on ticket workflows." title="No members found" />
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/10">
+    <DataTable>
       <table className="w-full text-left text-sm text-slate-200">
-        <thead className="bg-white/[0.04] text-xs uppercase tracking-[0.18em] text-slate-400">
+        <thead className={ui.tableHead}>
           <tr>
             <th className="px-4 py-3">Name</th>
             <th className="px-4 py-3">Email</th>
@@ -53,7 +54,7 @@ export function WorkspaceMembersTable({ portal, workspaceId, members }: Workspac
                       <input name="workspace_id" type="hidden" value={workspaceId} />
                       <input name="member_id" type="hidden" value={member.id} />
                       <select
-                        className="rounded-lg border border-white/10 bg-white/[0.06] px-2 py-1 text-xs"
+                        className="rounded-lg border border-white/10 bg-white/[0.06] px-2 py-1 text-xs text-white outline-none transition focus:border-cyan-300/50 focus:ring-2 focus:ring-cyan-300/20"
                         defaultValue={member.role}
                         name="role"
                       >
@@ -84,6 +85,6 @@ export function WorkspaceMembersTable({ portal, workspaceId, members }: Workspac
         </tbody>
       </table>
       {state.message ? <p className="px-4 py-3 text-xs text-slate-300">{state.message}</p> : null}
-    </div>
+    </DataTable>
   );
 }

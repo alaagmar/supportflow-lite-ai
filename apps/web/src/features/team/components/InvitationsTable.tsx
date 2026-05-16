@@ -1,4 +1,7 @@
 import { revokeWorkspaceInvitationAction } from "@/app/actions";
+import { DataTable } from "@/components/ui/data-table";
+import { EmptyState } from "@/components/ui/empty-state";
+import { ui } from "@/components/ui/styles";
 import type { PortalSlug } from "@/lib/api";
 import type { WorkspaceInvitation } from "@/features/team/types";
 
@@ -11,16 +14,17 @@ type InvitationsTableProps = {
 export function InvitationsTable({ portal, workspaceId, invitations }: InvitationsTableProps) {
   if (invitations.length === 0) {
     return (
-      <p className="rounded-2xl border border-dashed border-white/10 bg-slate-950/50 p-4 text-sm text-slate-400">
-        No invitations for this workspace yet.
-      </p>
+      <EmptyState
+        description="Invite admins, agents, and viewers to collaborate in this workspace."
+        title="No invitations yet"
+      />
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/10">
+    <DataTable>
       <table className="w-full text-left text-sm text-slate-200">
-        <thead className="bg-white/[0.04] text-xs uppercase tracking-[0.18em] text-slate-400">
+        <thead className={ui.tableHead}>
           <tr>
             <th className="px-4 py-3">Email</th>
             <th className="px-4 py-3">Role</th>
@@ -40,7 +44,7 @@ export function InvitationsTable({ portal, workspaceId, invitations }: Invitatio
                     <input name="portal" type="hidden" value={portal} />
                     <input name="workspace_id" type="hidden" value={workspaceId} />
                     <input name="invitation_id" type="hidden" value={invitation.id} />
-                    <button className="rounded-xl border border-rose-300/30 px-3 py-2 text-xs font-semibold text-rose-100" type="submit">
+                    <button className="rounded-lg border border-rose-300/30 px-3 py-2 text-xs font-semibold text-rose-100" type="submit">
                       Revoke
                     </button>
                   </form>
@@ -52,6 +56,6 @@ export function InvitationsTable({ portal, workspaceId, invitations }: Invitatio
           ))}
         </tbody>
       </table>
-    </div>
+    </DataTable>
   );
 }
