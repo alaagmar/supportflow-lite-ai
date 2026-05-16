@@ -82,6 +82,14 @@ export default async function OwnerWorkspacesPage() {
 }
 
 function WorkspaceCard({ workspace }: { workspace: ApiWorkspace }) {
+  const workspaceActions = [
+    { href: `/owner/workspaces/${workspace.id}/tickets`, label: "Open ticket queue" },
+    { href: `/owner/workspaces/${workspace.id}/policies`, label: "Open knowledge base" },
+    { href: `/owner/workspaces/${workspace.id}/team`, label: "Open team management" },
+    { href: `/owner/workspaces/${workspace.id}/analytics`, label: "Open analytics" },
+    { href: `/owner/workspaces/${workspace.id}/audit-logs`, label: "Open audit logs" },
+  ];
+
   return (
     <article className="rounded-2xl border border-white/10 bg-slate-950/70 p-5 transition hover:border-cyan-300/30">
       <div className="flex items-start justify-between gap-4">
@@ -95,33 +103,26 @@ function WorkspaceCard({ workspace }: { workspace: ApiWorkspace }) {
       </div>
       <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
         <div className="rounded-xl bg-white/[0.04] p-3">
-          <p className="text-slate-500">Queues</p>
-          <p className="mt-1 font-semibold text-white">Available</p>
+          <p className="text-slate-500">Ticket workflow</p>
+          <p className="mt-1 font-semibold text-white">Full control</p>
         </div>
         <div className="rounded-xl bg-white/[0.04] p-3">
-          <p className="text-slate-500">AI runs</p>
-          <p className="mt-1 font-semibold text-white">Next slice</p>
+          <p className="text-slate-500">Governance</p>
+          <p className="mt-1 font-semibold text-white">Team, audit, analytics</p>
         </div>
       </div>
 
-      <Link
-        className="mt-4 inline-flex rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:border-cyan-300/30 hover:bg-cyan-300/10"
-        href={`/owner/workspaces/${workspace.id}/tickets`}
-      >
-        Open ticket queue
-      </Link>
-      <Link
-        className="mt-4 inline-flex rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:border-cyan-300/30 hover:bg-cyan-300/10"
-        href={`/owner/workspaces/${workspace.id}/policies`}
-      >
-        Open knowledge base
-      </Link>
-      <Link
-        className="mt-4 inline-flex rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:border-cyan-300/30 hover:bg-cyan-300/10"
-        href={`/owner/workspaces/${workspace.id}/team`}
-      >
-        Open team management
-      </Link>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {workspaceActions.map((action) => (
+          <Link
+            className="inline-flex rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:border-cyan-300/30 hover:bg-cyan-300/10"
+            href={action.href}
+            key={action.href}
+          >
+            {action.label}
+          </Link>
+        ))}
+      </div>
     </article>
   );
 }
