@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\Workspaces\UseCases;
 
+use App\Domain\Workspaces\Support\WorkspaceInvitationActivationTokenService;
+use App\Jobs\SendWorkspaceInvitationActivationEmail;
 use App\Models\User;
 use App\Models\WorkspaceInvitation;
 use App\Models\WorkspaceMember;
@@ -12,6 +14,10 @@ use Illuminate\Validation\ValidationException;
 
 final class InviteWorkspaceMember
 {
+    public function __construct(
+        private readonly WorkspaceInvitationActivationTokenService $activationTokens,
+    ) {}
+
     public function handle(User $actor, int $workspaceId, string $email, string $role): WorkspaceInvitation
     {
         $actorRole = WorkspaceMember::query()
@@ -64,6 +70,19 @@ final class InviteWorkspaceMember
             'invited_email' => $normalizedEmail,
             'invited_role' => $role,
         ]);
+
+        $existingUser = User::query()
+            ->whereRaw('LOWER(email) = ?', [$normalizedEmail])
+            ->exists();
+
+        if (! $existingUser) {
+            $issuedToken = $this->activationTokens->issueInitialToken($invitation);
+
+            SendWorkspaceInvitationActivationEmail::dispatch(
+                invitationId: $invitation->id,
+                plainToken: $issuedToken['plain_token'],
+            );
+        }
 
         return $invitation;
     }

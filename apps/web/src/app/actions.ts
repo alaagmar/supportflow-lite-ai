@@ -594,9 +594,13 @@ function formatStatusLabel(status: TicketStatus): string {
 
 function formError(error: unknown): FormState {
   if (error instanceof ApiRequestError) {
+    const firstFieldError = error.errors
+      ? Object.values(error.errors).flat()[0]
+      : undefined;
+
     return {
       errors: error.errors,
-      message: error.message,
+      message: firstFieldError ?? error.message,
     };
   }
 

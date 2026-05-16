@@ -147,7 +147,7 @@ When planning the remaining product work with Speckit, use this order unless a f
 3. Billing mock and provider settings.
 
 <!-- SPECKIT START -->
-For additional context about current Speckit work for team invitation/member management,
+For additional context about current Speckit work for invited user activation,
 project structure, shell commands, and workflows, read the active plan:
-`specs/001-team-invite-management/plan.md`
+`specs/002-invited-user-activation/plan.md`
 <!-- SPECKIT END -->
