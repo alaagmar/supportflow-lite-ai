@@ -1,4 +1,7 @@
 import type { AuditLogEntry } from "@/features/audit-analytics/types";
+import { DataTable } from "@/components/ui/data-table";
+import { EmptyState } from "@/components/ui/empty-state";
+import { ui } from "@/components/ui/styles";
 
 type AuditTimelineTableProps = {
   entries: AuditLogEntry[];
@@ -7,16 +10,17 @@ type AuditTimelineTableProps = {
 export function AuditTimelineTable({ entries }: AuditTimelineTableProps) {
   if (entries.length === 0) {
     return (
-      <p className="rounded-2xl border border-dashed border-white/10 bg-slate-950/50 p-5 text-sm leading-6 text-slate-400">
-        No audit events match the current filters.
-      </p>
+      <EmptyState
+        description="Try broadening date windows or clearing filter fields."
+        title="No audit events match current filters"
+      />
     );
   }
 
   return (
-    <div className="overflow-x-auto rounded-2xl border border-white/10 bg-slate-950/70">
+    <DataTable>
       <table className="min-w-full text-left text-sm text-slate-200">
-        <thead className="border-b border-white/10 bg-slate-900/70 text-xs uppercase tracking-[0.18em] text-slate-400">
+        <thead className={ui.tableHead}>
           <tr>
             <th className="px-4 py-3">Time</th>
             <th className="px-4 py-3">Action</th>
@@ -35,7 +39,7 @@ export function AuditTimelineTable({ entries }: AuditTimelineTableProps) {
           ))}
         </tbody>
       </table>
-    </div>
+    </DataTable>
   );
 }
 

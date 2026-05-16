@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { WorkspaceRole } from "@/lib/api";
 
 type AuditAnalyticsAccessGuardProps = {
@@ -9,9 +10,10 @@ type AuditAnalyticsAccessGuardProps = {
 export function AuditAnalyticsAccessGuard({ role, children }: AuditAnalyticsAccessGuardProps) {
   if (role === "agent") {
     return (
-      <p className="rounded-2xl border border-dashed border-white/10 bg-slate-950/50 p-4 text-sm leading-6 text-slate-400">
-        Audit and analytics are read-only views available to owner, admin, and viewer roles.
-      </p>
+      <EmptyState
+        description="Audit and analytics are read-only views available to owner, admin, and viewer roles."
+        title="Access restricted for agents"
+      />
     );
   }
 

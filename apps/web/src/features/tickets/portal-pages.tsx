@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { logoutAction } from "@/app/actions";
+import { AppShell } from "@/components/ui/app-shell";
+import { EmptyState } from "@/components/ui/empty-state";
+import { SectionHeader } from "@/components/ui/section-header";
+import { ui } from "@/components/ui/styles";
 import { PortalTicketCreateForm } from "@/components/tickets/portal-ticket-create-form";
 import { TicketAiProcessForm } from "@/components/tickets/ticket-ai-process-form";
 import { TicketStatusForm } from "@/components/tickets/ticket-status-form";
@@ -139,89 +143,68 @@ export async function PortalTicketListPage({ portal, params }: PortalTicketListP
   const canManageTickets = workspace.role !== "viewer";
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.2),transparent_30%),linear-gradient(135deg,#020617,#111827_46%,#020617)] px-6 py-8 text-white sm:px-10 lg:px-16">
-      <div className="mx-auto max-w-6xl">
-        <header className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-100">{view.eyebrow}</p>
-            <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">{workspace.name} tickets</h1>
-            <p className="mt-3 text-sm text-slate-400">Signed in as {session.data.user.email}</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link
-              className="rounded-2xl border border-white/10 bg-white/[0.05] px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/[0.1]"
-              href={view.backHref}
-            >
-              {view.backLabel}
-            </Link>
-            <form action={logoutAction}>
-              <button
-                className="rounded-2xl border border-white/10 bg-white/[0.05] px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/[0.1]"
-                type="submit"
-              >
-                Sign out
-              </button>
-            </form>
-          </div>
-        </header>
+    <AppShell
+      actions={(
+        <>
+          <Link className={ui.buttonSecondary} href={view.backHref}>
+            {view.backLabel}
+          </Link>
+          <form action={logoutAction}>
+            <button className={ui.buttonSecondary} type="submit">
+              Sign out
+            </button>
+          </form>
+        </>
+      )}
+      description={`Signed in as ${session.data.user.email}`}
+      eyebrow={view.eyebrow}
+      title={`${workspace.name} tickets`}
+    >
+      <section className={ui.sectionCard}>
+        <SectionHeader
+          eyebrow="Ticket queue"
+          meta={`${tickets.data.length} ticket${tickets.data.length === 1 ? "" : "s"}`}
+          title={`Workspace role: ${workspace.role}`}
+        />
 
-        <section className="rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-cyan-950/20">
-          <div className="flex flex-col justify-between gap-3 border-b border-white/10 pb-5 sm:flex-row sm:items-end">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-100">Ticket queue</p>
-              <h2 className="mt-3 text-2xl font-semibold text-white">
-                Workspace role: <span className="capitalize">{workspace.role}</span>
-              </h2>
-            </div>
-            <p className="text-sm text-slate-400">
-              {tickets.data.length} ticket{tickets.data.length === 1 ? "" : "s"}
-            </p>
+        {canManageTickets ? (
+          <div className="mt-5">
+            <PortalTicketCreateForm portal={portal} workspaceId={workspaceId} />
           </div>
+        ) : (
+          <div className="mt-5">
+            <EmptyState description="Your viewer role is read-only for ticket actions." title="Read-only ticket mode" />
+          </div>
+        )}
 
-          {canManageTickets ? (
-            <div className="mt-5">
-              <PortalTicketCreateForm portal={portal} workspaceId={workspaceId} />
-            </div>
-          ) : (
-            <p className="mt-5 rounded-2xl border border-dashed border-white/10 bg-slate-950/50 p-4 text-sm text-slate-400">
-              Your viewer role is read-only for ticket actions.
-            </p>
-          )}
-
-          {tickets.data.length > 0 ? (
-            <div className="mt-6 grid gap-4 md:grid-cols-2">
-              {tickets.data.map((ticket) => (
-                <article
-                  className="rounded-2xl border border-white/10 bg-slate-950/70 p-5 transition hover:border-cyan-300/30"
-                  key={ticket.id}
+        {tickets.data.length > 0 ? (
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {tickets.data.map((ticket) => (
+              <article className="panel-muted transition duration-200 hover:border-cyan-300/35 p-4" key={ticket.id}>
+                <div className="flex items-start justify-between gap-4">
+                  <h3 className="text-lg font-semibold text-white">{ticket.subject}</h3>
+                  <span className={`rounded-full border px-3 py-1 text-xs font-medium ${statusTone[ticket.status]}`}>
+                    {ticket.status}
+                  </span>
+                </div>
+                <p className="text-muted mt-2 text-sm">{ticket.customer_email}</p>
+                <p className="text-muted mt-3 max-h-20 overflow-hidden text-sm leading-6">{ticket.body}</p>
+                <Link
+                  className="mt-4 inline-flex rounded-lg border border-white/15 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:border-cyan-300/30 hover:bg-cyan-300/10"
+                  href={`/${portal}/workspaces/${workspaceId}/tickets/${ticket.id}`}
                 >
-                  <div className="flex items-start justify-between gap-4">
-                    <h3 className="text-lg font-semibold text-white">{ticket.subject}</h3>
-                    <span
-                      className={`rounded-full border px-3 py-1 text-xs font-medium ${statusTone[ticket.status]}`}
-                    >
-                      {ticket.status}
-                    </span>
-                  </div>
-                  <p className="mt-2 text-sm text-slate-400">{ticket.customer_email}</p>
-                  <p className="mt-3 max-h-20 overflow-hidden text-sm leading-6 text-slate-300">{ticket.body}</p>
-                  <Link
-                    className="mt-4 inline-flex rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:border-cyan-300/30 hover:bg-cyan-300/10"
-                    href={`/${portal}/workspaces/${workspaceId}/tickets/${ticket.id}`}
-                  >
-                    Open ticket
-                  </Link>
-                </article>
-              ))}
-            </div>
-          ) : (
-            <p className="mt-6 rounded-2xl border border-dashed border-white/10 bg-slate-950/50 p-6 text-sm leading-6 text-slate-400">
-              No tickets are available in this workspace yet.
-            </p>
-          )}
-        </section>
-      </div>
-    </main>
+                  Open ticket
+                </Link>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="mt-6">
+            <EmptyState description="No tickets are available in this workspace yet." title="No tickets yet" />
+          </div>
+        )}
+      </section>
+    </AppShell>
   );
 }
 
@@ -308,176 +291,176 @@ export async function PortalTicketDetailPage({ portal, params }: PortalTicketDet
   const canManageTicket = workspace.role !== "viewer";
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.2),transparent_30%),linear-gradient(135deg,#020617,#111827_46%,#020617)] px-6 py-8 text-white sm:px-10 lg:px-16">
-      <div className="mx-auto max-w-4xl">
-        <header className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
+    <AppShell
+      actions={(
+        <>
+          <Link className={ui.buttonSecondary} href={`/${portal}/workspaces/${workspaceId}/tickets`}>
+            Back to queue
+          </Link>
+          <form action={logoutAction}>
+            <button className={ui.buttonSecondary} type="submit">
+              Sign out
+            </button>
+          </form>
+        </>
+      )}
+      description={`Signed in as ${session.data.user.email}`}
+      eyebrow="Ticket detail"
+      maxWidth="4xl"
+      title={ticket.subject}
+    >
+      <section className={ui.sectionCard}>
+        <div className="flex flex-col justify-between gap-3 border-b border-white/10 pb-5 sm:flex-row sm:items-center">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-100">Ticket detail</p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">{ticket.subject}</h1>
-            <p className="mt-3 text-sm text-slate-400">Signed in as {session.data.user.email}</p>
+            <p className="text-muted text-sm">Workspace</p>
+            <p className="mt-1 font-semibold text-white">{workspace.name}</p>
           </div>
-          <div className="flex items-center gap-3">
-            <Link
-              className="rounded-2xl border border-white/10 bg-white/[0.05] px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/[0.1]"
-              href={`/${portal}/workspaces/${workspaceId}/tickets`}
-            >
-              Back to queue
-            </Link>
-            <form action={logoutAction}>
-              <button
-                className="rounded-2xl border border-white/10 bg-white/[0.05] px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/[0.1]"
-                type="submit"
-              >
-                Sign out
-              </button>
-            </form>
-          </div>
-        </header>
+          <span className={`rounded-full border px-3 py-1 text-xs font-medium ${statusTone[ticket.status]}`}>
+            {ticket.status}
+          </span>
+        </div>
 
-        <section className="rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-6 shadow-2xl shadow-cyan-950/20">
-          <div className="flex flex-col justify-between gap-3 border-b border-white/10 pb-5 sm:flex-row sm:items-center">
+        <dl className="mt-6 grid gap-5 sm:grid-cols-2">
+          <div className="panel-muted p-4">
+            <dt className="text-xs uppercase tracking-[0.2em] text-slate-500">Customer</dt>
+            <dd className="mt-2 font-medium text-white">{ticket.customer_name}</dd>
+          </div>
+          <div className="panel-muted p-4">
+            <dt className="text-xs uppercase tracking-[0.2em] text-slate-500">Email</dt>
+            <dd className="mt-2 font-medium text-white">{ticket.customer_email}</dd>
+          </div>
+        </dl>
+
+        <article className="panel-muted mt-5">
+          <h2 className="text-lg font-semibold text-white">Message</h2>
+          <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-200">{ticket.body}</p>
+        </article>
+
+        <section className="panel-muted mt-5">
+          <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-sm text-slate-400">Workspace</p>
-              <p className="mt-1 font-semibold text-white">{workspace.name}</p>
+              <h2 className="text-lg font-semibold text-white">AI review output</h2>
+              <p className="mt-2 text-sm text-slate-400">
+                Classification and draft suggestions for human review before customer response.
+              </p>
             </div>
-            <span className={`rounded-full border px-3 py-1 text-xs font-medium ${statusTone[ticket.status]}`}>
-              {ticket.status}
+            <span
+              className={`rounded-full border px-3 py-1 text-xs font-medium ${statusTone[aiReview.data.ticket_status]}`}
+            >
+              {formatLabel(aiReview.data.ticket_status)}
             </span>
           </div>
 
-          <dl className="mt-6 grid gap-5 sm:grid-cols-2">
-            <div className="rounded-2xl bg-slate-950/60 p-4">
-              <dt className="text-xs uppercase tracking-[0.2em] text-slate-500">Customer</dt>
-              <dd className="mt-2 font-medium text-white">{ticket.customer_name}</dd>
-            </div>
-            <div className="rounded-2xl bg-slate-950/60 p-4">
-              <dt className="text-xs uppercase tracking-[0.2em] text-slate-500">Email</dt>
-              <dd className="mt-2 font-medium text-white">{ticket.customer_email}</dd>
-            </div>
-          </dl>
+          {aiOutput ? (
+            <div className="mt-5 space-y-5">
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <AiMetricCard label="Category" value={aiOutput.category} />
+                <AiMetricCard label="Urgency" value={aiOutput.urgency} />
+                <AiMetricCard label="Sentiment" value={aiOutput.sentiment} />
+                <AiMetricCard label="Language" value={aiOutput.language} />
+              </div>
 
-          <article className="mt-5 rounded-2xl border border-white/10 bg-slate-950/70 p-5">
-            <h2 className="text-lg font-semibold text-white">Message</h2>
-            <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-200">{ticket.body}</p>
-          </article>
+              <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Summary</p>
+                <p className="mt-2 text-sm leading-6 text-slate-200">{aiOutput.summary ?? "No summary available."}</p>
+              </div>
 
-          <section className="mt-5 rounded-2xl border border-white/10 bg-slate-950/70 p-5">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 className="text-lg font-semibold text-white">AI review output</h2>
-                <p className="mt-2 text-sm text-slate-400">
-                  Classification and draft suggestions for human review before customer response.
+              <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Draft reply</p>
+                <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-200">
+                  {aiOutput.draft_reply ?? "No draft reply generated yet."}
                 </p>
               </div>
-              <span
-                className={`rounded-full border px-3 py-1 text-xs font-medium ${statusTone[aiReview.data.ticket_status]}`}
-              >
-                {formatLabel(aiReview.data.ticket_status)}
-              </span>
-            </div>
 
-            {aiOutput ? (
-              <div className="mt-5 space-y-5">
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                  <AiMetricCard label="Category" value={aiOutput.category} />
-                  <AiMetricCard label="Urgency" value={aiOutput.urgency} />
-                  <AiMetricCard label="Sentiment" value={aiOutput.sentiment} />
-                  <AiMetricCard label="Language" value={aiOutput.language} />
-                </div>
-
-                <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4">
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Summary</p>
-                  <p className="mt-2 text-sm leading-6 text-slate-200">{aiOutput.summary ?? "No summary available."}</p>
-                </div>
-
-                <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4">
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Draft reply</p>
-                  <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-200">
-                    {aiOutput.draft_reply ?? "No draft reply generated yet."}
-                  </p>
-                </div>
-
-                <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4">
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Recommended action</p>
-                  <p className="mt-2 text-sm leading-6 text-slate-200">
-                    {aiOutput.recommended_action ?? "No recommendation available."}
-                  </p>
-                  <p className="mt-3 text-xs text-slate-400">
-                    Human approval required: {aiOutput.requires_human_approval ? "Yes" : "No"}
-                    {aiOutput.confidence ? ` · Confidence ${aiOutput.confidence}` : ""}
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <p className="mt-5 rounded-2xl border border-dashed border-white/10 bg-slate-950/50 p-4 text-sm text-slate-400">
-                No AI output has been generated for this ticket yet.
-              </p>
-            )}
-
-            <div className="mt-5">
-              {portal === "staff" ? (
-                <div className="mb-5 rounded-2xl border border-white/10 bg-slate-900/60 p-4">
-                  <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Policy evidence</h3>
-                  <PolicyEvidenceList evidence={aiOutput?.evidence_json} />
-                </div>
-              ) : null}
-
-              <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Recent AI runs</h3>
-              {aiRuns.length > 0 ? (
-                <div className="mt-3 space-y-3">
-                  {aiRuns.map((run) => (
-                    <article className="rounded-2xl border border-white/10 bg-slate-900/60 p-4" key={run.id}>
-                      <div className="flex flex-wrap items-center justify-between gap-3">
-                        <p className="text-sm font-semibold text-white">{formatLabel(run.task_type)}</p>
-                        <span
-                          className={`rounded-full border px-3 py-1 text-xs font-medium ${aiRunStatusTone[run.status] ?? aiRunStatusTone.pending}`}
-                        >
-                          {formatLabel(run.status)}
-                        </span>
-                      </div>
-                      <p className="mt-2 text-xs text-slate-400">
-                        {run.provider}
-                        {run.model ? ` · ${run.model}` : ""}
-                        {run.latency_ms ? ` · ${run.latency_ms} ms` : ""}
-                        {run.confidence ? ` · confidence ${run.confidence}` : ""}
-                      </p>
-                      {run.error_message ? (
-                        <p className="mt-2 text-xs text-rose-200">{run.error_message}</p>
-                      ) : null}
-                    </article>
-                  ))}
-                </div>
-              ) : (
-                <p className="mt-3 rounded-2xl border border-dashed border-white/10 bg-slate-950/50 p-4 text-sm text-slate-400">
-                  No AI runs have been recorded for this ticket yet.
+              <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Recommended action</p>
+                <p className="mt-2 text-sm leading-6 text-slate-200">
+                  {aiOutput.recommended_action ?? "No recommendation available."}
                 </p>
-              )}
-            </div>
-          </section>
-
-          {canManageTicket ? (
-            <div className="mt-5 grid gap-5 lg:grid-cols-2">
-              <TicketAiProcessForm
-                portal={portal}
-                ticketId={ticket.id}
-                ticketStatus={ticket.status}
-                workspaceId={workspaceId}
-              />
-              <TicketStatusForm
-                currentStatus={ticket.status}
-                portal={portal}
-                ticketId={ticket.id}
-                workspaceId={workspaceId}
-              />
+                <p className="mt-3 text-xs text-slate-400">
+                  Human approval required: {aiOutput.requires_human_approval ? "Yes" : "No"}
+                  {aiOutput.confidence ? ` · Confidence ${aiOutput.confidence}` : ""}
+                </p>
+              </div>
             </div>
           ) : (
-            <p className="mt-5 rounded-2xl border border-dashed border-white/10 bg-slate-950/50 p-4 text-sm text-slate-400">
-              Viewer role can inspect ticket details and AI output, but cannot run AI processing or change status.
-            </p>
+            <div className="mt-5">
+              <EmptyState
+                description="Queue AI triage when the ticket is ready for classification and draft generation."
+                title="No AI output generated yet"
+              />
+            </div>
           )}
+
+          <div className="mt-5">
+            {portal === "staff" ? (
+              <div className="mb-5 rounded-2xl border border-white/10 bg-slate-900/60 p-4">
+                <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Policy evidence</h3>
+                <PolicyEvidenceList evidence={aiOutput?.evidence_json} />
+              </div>
+            ) : null}
+
+            <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Recent AI runs</h3>
+            {aiRuns.length > 0 ? (
+              <div className="mt-3 space-y-3">
+                {aiRuns.map((run) => (
+                  <article className="rounded-2xl border border-white/10 bg-slate-900/60 p-4" key={run.id}>
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <p className="text-sm font-semibold text-white">{formatLabel(run.task_type)}</p>
+                      <span
+                        className={`rounded-full border px-3 py-1 text-xs font-medium ${aiRunStatusTone[run.status] ?? aiRunStatusTone.pending}`}
+                      >
+                        {formatLabel(run.status)}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-xs text-slate-400">
+                      {run.provider}
+                      {run.model ? ` · ${run.model}` : ""}
+                      {run.latency_ms ? ` · ${run.latency_ms} ms` : ""}
+                      {run.confidence ? ` · confidence ${run.confidence}` : ""}
+                    </p>
+                    {run.error_message ? (
+                      <p className="mt-2 text-xs text-rose-200">{run.error_message}</p>
+                    ) : null}
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <div className="mt-3">
+                <EmptyState
+                  description="Run AI processing to create an initial triage pass and draft response."
+                  title="No AI runs recorded"
+                />
+              </div>
+            )}
+          </div>
         </section>
-      </div>
-    </main>
+
+        {canManageTicket ? (
+          <div className="mt-5 grid gap-5 lg:grid-cols-2">
+            <TicketAiProcessForm
+              portal={portal}
+              ticketId={ticket.id}
+              ticketStatus={ticket.status}
+              workspaceId={workspaceId}
+            />
+            <TicketStatusForm
+              currentStatus={ticket.status}
+              portal={portal}
+              ticketId={ticket.id}
+              workspaceId={workspaceId}
+            />
+          </div>
+        ) : (
+          <div className="mt-5">
+            <EmptyState
+              description="Viewer role can inspect ticket details and AI output, but cannot run AI processing or change status."
+              title="Actions unavailable for viewer role"
+            />
+          </div>
+        )}
+      </section>
+    </AppShell>
   );
 }
 
@@ -490,7 +473,7 @@ function formatLabel(value: string): string {
 
 function AiMetricCard({ label, value }: { label: string; value?: string | null }) {
   return (
-    <article className="rounded-2xl border border-white/10 bg-slate-900/60 p-4">
+    <article className="panel-muted">
       <p className="text-xs uppercase tracking-[0.2em] text-slate-500">{label}</p>
       <p className="mt-2 text-sm font-medium text-white">{value ? formatLabel(value) : "N/A"}</p>
     </article>

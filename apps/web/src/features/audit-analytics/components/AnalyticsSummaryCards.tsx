@@ -1,4 +1,5 @@
 import type { WorkspaceAnalyticsSummary } from "@/features/audit-analytics/types";
+import { StatCard } from "@/components/ui/stat-card";
 
 type AnalyticsSummaryCardsProps = {
   summary: WorkspaceAnalyticsSummary;
@@ -16,10 +17,7 @@ export function AnalyticsSummaryCards({ summary }: AnalyticsSummaryCardsProps) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {cards.map((card) => (
-        <article className="rounded-2xl border border-white/10 bg-slate-950/70 p-5" key={card.label}>
-          <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{card.label}</p>
-          <p className="mt-3 text-3xl font-semibold text-white">{card.value}</p>
-        </article>
+        <StatCard key={card.label} label={card.label} value={card.value} />
       ))}
     </div>
   );

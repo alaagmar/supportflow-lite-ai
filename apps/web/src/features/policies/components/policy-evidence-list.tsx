@@ -1,3 +1,5 @@
+import { EmptyState } from "@/components/ui/empty-state";
+
 type PolicyEvidenceItem = {
   source?: string;
   policy_document_id?: number;
@@ -20,9 +22,12 @@ export function PolicyEvidenceList({ evidence }: PolicyEvidenceListProps) {
 
   if (policyEvidence.length === 0) {
     return (
-      <p className="mt-4 rounded-2xl border border-dashed border-white/10 bg-slate-950/50 p-4 text-sm text-slate-400">
-        No policy evidence is attached to this AI output yet.
-      </p>
+      <div className="mt-4">
+        <EmptyState
+          description="Run AI processing again after adding policy context if you expect evidence links."
+          title="No policy evidence attached"
+        />
+      </div>
     );
   }
 

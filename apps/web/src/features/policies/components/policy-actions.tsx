@@ -2,6 +2,7 @@ import {
   archivePolicyDocumentAction,
   unarchivePolicyDocumentAction,
 } from "@/app/actions";
+import { ui } from "@/components/ui/styles";
 import type { PortalSlug, WorkspaceRole } from "@/lib/api";
 import type { PolicyDocumentStatus } from "@/lib/api/policies";
 
@@ -31,10 +32,7 @@ export function PolicyActions({ portal, role, workspaceId, policyId, status }: P
           <input name="portal" type="hidden" value={portal} />
           <input name="workspace_id" type="hidden" value={workspaceId} />
           <input name="policy_id" type="hidden" value={policyId} />
-          <button
-            className="rounded-2xl border border-rose-300/30 bg-rose-500/10 px-4 py-2 text-sm font-semibold text-rose-100 transition hover:bg-rose-500/20"
-            type="submit"
-          >
+          <button className={ui.buttonDanger} type="submit">
             Archive policy
           </button>
         </form>
@@ -43,10 +41,7 @@ export function PolicyActions({ portal, role, workspaceId, policyId, status }: P
           <input name="portal" type="hidden" value={portal} />
           <input name="workspace_id" type="hidden" value={workspaceId} />
           <input name="policy_id" type="hidden" value={policyId} />
-          <button
-            className="rounded-2xl border border-emerald-300/30 bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-100 transition hover:bg-emerald-500/20"
-            type="submit"
-          >
+          <button className={ui.buttonSecondary} type="submit">
             Unarchive policy
           </button>
         </form>
