@@ -15,6 +15,9 @@ Next.js 15 App Router dashboard for SupportFlow Lite AI.
 - Ticket creation and ticket status update server actions/forms.
 - AI output review with policy evidence rendering in ticket detail flows.
 - Owner/admin policy list and management pages with policy create/edit/archive/unarchive actions.
+- Team invitation/member management pages for owner/admin plus invitee workflows.
+- Owner/admin/staff workspace audit timeline pages with filtering support.
+- Owner/admin/staff workspace analytics summary pages with date-window selection.
 - Project metadata in `src/app/layout.tsx`.
 - `output: "standalone"` in `next.config.ts` for the production Docker image.
 
@@ -73,4 +76,4 @@ The Docker runtime uses Node `24.15.0`.
 
 ## Current UI
 
-The frontend now includes live owner/admin/staff portal flows with workspace, ticket, AI review evidence, and policy workflows. Remaining UI work is primarily team invitation/member management, audit/analytics, and billing/provider settings.
+The frontend now includes live owner/admin/staff portal flows with workspace, ticket, AI review evidence, policy, team, and audit/analytics workflows. Remaining planned UI module is billing/provider settings.

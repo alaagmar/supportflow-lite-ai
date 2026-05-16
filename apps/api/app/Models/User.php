@@ -99,4 +99,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(WorkspaceInvitation::class, 'accepted_by_user_id');
     }
+
+    /**
+     * @return HasMany<AuditLog, $this>
+     */
+    public function auditLogs(): HasMany
+    {
+        return $this->hasMany(AuditLog::class, 'user_id');
+    }
 }

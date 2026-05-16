@@ -119,4 +119,13 @@ class Ticket extends Model
     {
         return $this->hasOne(TicketAiOutput::class);
     }
+
+    /**
+     * @return HasMany<AuditLog, $this>
+     */
+    public function auditLogs(): HasMany
+    {
+        return $this->hasMany(AuditLog::class, 'entity_id')
+            ->where('entity_type', 'ticket');
+    }
 }
