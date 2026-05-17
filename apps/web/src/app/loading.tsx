@@ -1,9 +1,10 @@
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
+import { ui } from "@/components/ui/styles";
 
 export default function RootLoading() {
   return (
-    <main className="min-h-screen app-bg px-6 py-8 text-white sm:px-10 lg:px-16">
-      <div className="mx-auto max-w-6xl space-y-6">
+    <main className={ui.pageFrame}>
+      <div className={ui.appContainer}>
         <LoadingSkeleton className="h-6 w-40" />
         <LoadingSkeleton className="h-14 w-3/4" />
         <LoadingSkeleton className="h-36 w-full" />

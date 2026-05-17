@@ -82,7 +82,7 @@ function WorkspaceCard({ workspace }: { workspace: ApiWorkspace }) {
   ];
 
   return (
-    <article className="panel-muted transition duration-200 hover:border-cyan-300/35 p-4">
+    <article className="panel-muted transition duration-200 hover:-translate-y-0.5 hover:border-cyan-300/40">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 className="text-lg font-semibold text-white">{workspace.name}</h3>
@@ -103,7 +103,7 @@ function WorkspaceCard({ workspace }: { workspace: ApiWorkspace }) {
       <div className="mt-5 flex flex-wrap gap-2">
         {workspaceActions.map((action) => (
           <Link
-            className="inline-flex rounded-lg border border-white/15 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:border-cyan-300/30 hover:bg-cyan-300/10"
+            className={ui.actionChip}
             href={action.href}
             key={action.href}
           >

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { RiShieldCheckLine, RiShieldUserLine, RiTeamLine } from "react-icons/ri";
 import { FeatureCard } from "@/components/ui/feature-card";
 import { ui } from "@/components/ui/styles";
 
@@ -11,10 +12,10 @@ type AuthShellProps = {
 
 export function AuthShell({ children, description, eyebrow, title }: AuthShellProps) {
   return (
-    <main className="min-h-screen overflow-hidden app-bg px-6 py-8 text-white sm:px-10 lg:px-16">
-      <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-6xl flex-col">
+    <main className="min-h-screen overflow-hidden app-bg px-5 py-7 text-white sm:px-8 sm:py-8 lg:px-14 lg:py-10">
+      <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-[var(--container-wide)] flex-col">
         <nav className="flex items-center justify-between">
-          <Link className="text-sm font-semibold tracking-[0.3em] text-cyan-100" href="/">
+          <Link className="text-sm font-bold tracking-[0.2em] text-cyan-100" href="/">
             SUPPORTFLOW
           </Link>
           <Link className={ui.buttonSecondary} href="/">
@@ -22,7 +23,7 @@ export function AuthShell({ children, description, eyebrow, title }: AuthShellPr
           </Link>
         </nav>
 
-        <section className="grid flex-1 items-center gap-10 py-12 lg:grid-cols-[0.9fr_1.1fr]">
+        <section className="grid flex-1 items-center gap-10 py-[var(--space-section)] lg:grid-cols-[0.9fr_1.1fr]">
           <div>
             <p className="kicker">{eyebrow}</p>
             <h1 className="mt-7 max-w-xl text-4xl font-semibold tracking-tight sm:text-6xl">
@@ -33,16 +34,28 @@ export function AuthShell({ children, description, eyebrow, title }: AuthShellPr
             </p>
 
             <div className="mt-10 grid gap-3 sm:grid-cols-3">
-              <FeatureCard description="Every portal route is scoped to workspace membership." title="Tenant scoped" />
-              <FeatureCard description="First-party auth with secure session handling." title="Sanctum sessions" />
-              <FeatureCard description="Capabilities map to Owner, Admin, Agent, and Viewer roles." title="Role gated" />
+              <FeatureCard
+                description="Every portal route is scoped to workspace membership."
+                icon={<RiShieldCheckLine aria-hidden />}
+                title="Tenant scoped"
+              />
+              <FeatureCard
+                description="First-party auth with secure session handling."
+                icon={<RiShieldUserLine aria-hidden />}
+                title="Sanctum sessions"
+              />
+              <FeatureCard
+                description="Capabilities map to Owner, Admin, Agent, and Viewer roles."
+                icon={<RiTeamLine aria-hidden />}
+                title="Role gated"
+              />
             </div>
           </div>
 
           <div className="relative">
             <div className="absolute -left-10 top-10 h-40 w-40 rounded-full bg-cyan-300/20 blur-3xl" />
             <div className="absolute -right-10 bottom-10 h-48 w-48 rounded-full bg-blue-500/20 blur-3xl" />
-            <div className="panel relative p-4 sm:p-6">
+            <div className="panel relative p-4 sm:p-6 lg:p-7">
               {children}
             </div>
           </div>

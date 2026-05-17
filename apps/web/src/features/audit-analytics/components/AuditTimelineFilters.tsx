@@ -14,7 +14,7 @@ export function AuditTimelineFilters({
   actorUserId,
 }: AuditTimelineFiltersProps) {
   return (
-    <form className="grid gap-3 rounded-2xl border border-white/10 bg-slate-950/60 p-4 sm:grid-cols-2 lg:grid-cols-4">
+    <form className="grid gap-3 rounded-[var(--radius-lg)] border border-[color:var(--border)] bg-[color:var(--card)] p-4 sm:grid-cols-2 lg:grid-cols-4">
       <label className="text-xs uppercase tracking-[0.2em] text-slate-400">
         Start
         <input

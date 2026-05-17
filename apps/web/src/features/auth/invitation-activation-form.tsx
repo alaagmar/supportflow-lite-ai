@@ -84,13 +84,13 @@ export function InvitationActivationForm({ token }: InvitationActivationFormProp
       >
 
         {message ? (
-          <div className="rounded-2xl border border-emerald-300/20 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-100">
+          <div className={`${ui.alertBase} ${ui.alertSuccess}`}>
             {message}
           </div>
         ) : null}
 
         {error ? (
-          <div className="rounded-2xl border border-rose-300/20 bg-rose-400/10 px-4 py-3 text-sm text-rose-100">
+          <div className={`${ui.alertBase} ${ui.alertError}`}>
             {error}
           </div>
         ) : null}

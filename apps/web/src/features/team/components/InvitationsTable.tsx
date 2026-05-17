@@ -34,7 +34,7 @@ export function InvitationsTable({ portal, workspaceId, invitations }: Invitatio
         </thead>
         <tbody>
           {invitations.map((invitation) => (
-            <tr className="border-t border-white/10" key={invitation.id}>
+            <tr className="border-t border-[color:var(--border)]" key={invitation.id}>
               <td className="px-4 py-3">{invitation.invited_email}</td>
               <td className="px-4 py-3 capitalize">{invitation.invited_role}</td>
               <td className="px-4 py-3 capitalize">{invitation.status}</td>
@@ -44,7 +44,7 @@ export function InvitationsTable({ portal, workspaceId, invitations }: Invitatio
                     <input name="portal" type="hidden" value={portal} />
                     <input name="workspace_id" type="hidden" value={workspaceId} />
                     <input name="invitation_id" type="hidden" value={invitation.id} />
-                    <button className="rounded-lg border border-rose-300/30 px-3 py-2 text-xs font-semibold text-rose-100" type="submit">
+                    <button className={ui.actionChipDanger} type="submit">
                       Revoke
                     </button>
                   </form>

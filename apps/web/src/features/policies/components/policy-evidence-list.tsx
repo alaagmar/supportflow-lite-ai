@@ -1,4 +1,5 @@
 import { EmptyState } from "@/components/ui/empty-state";
+import { ui } from "@/components/ui/styles";
 
 type PolicyEvidenceItem = {
   source?: string;
@@ -34,7 +35,7 @@ export function PolicyEvidenceList({ evidence }: PolicyEvidenceListProps) {
   return (
     <div className="mt-4 space-y-3">
       {policyEvidence.map((item, index) => (
-        <article className="rounded-2xl border border-white/10 bg-slate-900/60 p-4" key={`${item.policy_document_id ?? index}-${index}`}>
+        <article className={ui.elevatedCard} key={`${item.policy_document_id ?? index}-${index}`}>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm font-semibold text-white">{item.policy_document_title ?? "Policy document"}</p>
             <p className="text-xs text-slate-400">

@@ -180,7 +180,7 @@ export async function PortalTicketListPage({ portal, params }: PortalTicketListP
         {tickets.data.length > 0 ? (
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             {tickets.data.map((ticket) => (
-              <article className="panel-muted transition duration-200 hover:border-cyan-300/35 p-4" key={ticket.id}>
+              <article className="panel-muted transition duration-200 hover:-translate-y-0.5 hover:border-cyan-300/35" key={ticket.id}>
                 <div className="flex items-start justify-between gap-4">
                   <h3 className="text-lg font-semibold text-white">{ticket.subject}</h3>
                   <span className={`rounded-full border px-3 py-1 text-xs font-medium ${statusTone[ticket.status]}`}>
@@ -190,7 +190,7 @@ export async function PortalTicketListPage({ portal, params }: PortalTicketListP
                 <p className="text-muted mt-2 text-sm">{ticket.customer_email}</p>
                 <p className="text-muted mt-3 max-h-20 overflow-hidden text-sm leading-6">{ticket.body}</p>
                 <Link
-                  className="mt-4 inline-flex rounded-lg border border-white/15 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:border-cyan-300/30 hover:bg-cyan-300/10"
+                  className={`mt-4 ${ui.actionChip}`}
                   href={`/${portal}/workspaces/${workspaceId}/tickets/${ticket.id}`}
                 >
                   Open ticket
@@ -310,7 +310,7 @@ export async function PortalTicketDetailPage({ portal, params }: PortalTicketDet
       title={ticket.subject}
     >
       <section className={ui.sectionCard}>
-        <div className="flex flex-col justify-between gap-3 border-b border-white/10 pb-5 sm:flex-row sm:items-center">
+        <div className="flex flex-col justify-between gap-3 border-b border-[color:var(--border)] pb-5 sm:flex-row sm:items-center">
           <div>
             <p className="text-muted text-sm">Workspace</p>
             <p className="mt-1 font-semibold text-white">{workspace.name}</p>
@@ -321,12 +321,12 @@ export async function PortalTicketDetailPage({ portal, params }: PortalTicketDet
         </div>
 
         <dl className="mt-6 grid gap-5 sm:grid-cols-2">
-          <div className="panel-muted p-4">
-            <dt className="text-xs uppercase tracking-[0.2em] text-slate-500">Customer</dt>
+          <div className="panel-muted">
+            <dt className="text-xs uppercase tracking-[0.2em] text-slate-400">Customer</dt>
             <dd className="mt-2 font-medium text-white">{ticket.customer_name}</dd>
           </div>
-          <div className="panel-muted p-4">
-            <dt className="text-xs uppercase tracking-[0.2em] text-slate-500">Email</dt>
+          <div className="panel-muted">
+            <dt className="text-xs uppercase tracking-[0.2em] text-slate-400">Email</dt>
             <dd className="mt-2 font-medium text-white">{ticket.customer_email}</dd>
           </div>
         </dl>
@@ -360,20 +360,20 @@ export async function PortalTicketDetailPage({ portal, params }: PortalTicketDet
                 <AiMetricCard label="Language" value={aiOutput.language} />
               </div>
 
-              <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Summary</p>
+              <div className={ui.elevatedCard}>
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Summary</p>
                 <p className="mt-2 text-sm leading-6 text-slate-200">{aiOutput.summary ?? "No summary available."}</p>
               </div>
 
-              <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Draft reply</p>
+              <div className={ui.elevatedCard}>
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Draft reply</p>
                 <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-200">
                   {aiOutput.draft_reply ?? "No draft reply generated yet."}
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Recommended action</p>
+              <div className={ui.elevatedCard}>
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Recommended action</p>
                 <p className="mt-2 text-sm leading-6 text-slate-200">
                   {aiOutput.recommended_action ?? "No recommendation available."}
                 </p>
@@ -394,7 +394,7 @@ export async function PortalTicketDetailPage({ portal, params }: PortalTicketDet
 
           <div className="mt-5">
             {portal === "staff" ? (
-              <div className="mb-5 rounded-2xl border border-white/10 bg-slate-900/60 p-4">
+              <div className={`mb-5 ${ui.elevatedCard}`}>
                 <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Policy evidence</h3>
                 <PolicyEvidenceList evidence={aiOutput?.evidence_json} />
               </div>
@@ -404,7 +404,7 @@ export async function PortalTicketDetailPage({ portal, params }: PortalTicketDet
             {aiRuns.length > 0 ? (
               <div className="mt-3 space-y-3">
                 {aiRuns.map((run) => (
-                  <article className="rounded-2xl border border-white/10 bg-slate-900/60 p-4" key={run.id}>
+                  <article className={ui.elevatedCard} key={run.id}>
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <p className="text-sm font-semibold text-white">{formatLabel(run.task_type)}</p>
                       <span
@@ -474,7 +474,7 @@ function formatLabel(value: string): string {
 function AiMetricCard({ label, value }: { label: string; value?: string | null }) {
   return (
     <article className="panel-muted">
-      <p className="text-xs uppercase tracking-[0.2em] text-slate-500">{label}</p>
+      <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{label}</p>
       <p className="mt-2 text-sm font-medium text-white">{value ? formatLabel(value) : "N/A"}</p>
     </article>
   );

@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { RiAdminLine, RiEyeLine, RiShieldStarLine, RiUserStarLine } from "react-icons/ri";
 import { logoutAction } from "@/app/actions";
 import { AppShell } from "@/components/ui/app-shell";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -55,8 +56,8 @@ export default async function StaffDashboardPage() {
           <div className="mt-5 space-y-3">
             {staffWorkspaces.length > 0 ? (
               staffWorkspaces.map((workspace) => (
-                <div className="panel-muted p-4" key={workspace.id}>
-                  <p className="mb-3 text-xs uppercase tracking-[0.2em] text-slate-500">{roleSummary(workspace.role)}</p>
+                <div className="panel-muted" key={workspace.id}>
+                  <p className="mb-3 text-xs uppercase tracking-[0.2em] text-slate-400">{roleSummary(workspace.role)}</p>
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="font-medium text-white">{workspace.name}</p>
@@ -68,7 +69,7 @@ export default async function StaffDashboardPage() {
                   <div className="mt-3 flex flex-wrap gap-2">
                     {workspaceActions(workspace.id, workspace.role).map((action) => (
                       <Link
-                        className="inline-flex rounded-lg border border-white/15 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:border-cyan-300/30 hover:bg-cyan-300/10"
+                        className={ui.actionChip}
                         href={action.href}
                         key={action.href}
                       >
@@ -89,12 +90,28 @@ export default async function StaffDashboardPage() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           {[
-            ["Owner", "Full workspace access in staff views, with ticket operations and reporting links."],
-            ["Admin", "Operational ownership across queue, assignment decisions, and reporting links."],
-            ["Agent", "Ticket execution and AI review actions, without audit or analytics access."],
-            ["Viewer", "Read-only ticket access plus audit and analytics visibility."],
-          ].map(([title, detail]) => (
-            <FeatureCard description={detail} key={title} title={title} />
+            {
+              title: "Owner",
+              detail: "Full workspace access in staff views, with ticket operations and reporting links.",
+              icon: <RiShieldStarLine aria-hidden />,
+            },
+            {
+              title: "Admin",
+              detail: "Operational ownership across queue, assignment decisions, and reporting links.",
+              icon: <RiAdminLine aria-hidden />,
+            },
+            {
+              title: "Agent",
+              detail: "Ticket execution and AI review actions, without audit or analytics access.",
+              icon: <RiUserStarLine aria-hidden />,
+            },
+            {
+              title: "Viewer",
+              detail: "Read-only ticket access plus audit and analytics visibility.",
+              icon: <RiEyeLine aria-hidden />,
+            },
+          ].map(({ title, detail, icon }) => (
+            <FeatureCard description={detail} icon={icon} key={title} title={title} />
           ))}
         </div>
       </section>

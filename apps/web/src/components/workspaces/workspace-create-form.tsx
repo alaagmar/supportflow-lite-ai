@@ -5,6 +5,7 @@ import { createWorkspaceAction, type FormState } from "@/app/actions";
 import { FormField } from "@/components/ui/form-field";
 import { FormSection } from "@/components/ui/form-section";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { ui } from "@/components/ui/styles";
 
 const initialState: FormState = {};
 
@@ -19,7 +20,7 @@ export function WorkspaceCreateForm() {
         title="Add workspace"
       >
         {state.message ? (
-          <div className="rounded-2xl border border-cyan-300/20 bg-cyan-300/10 px-4 py-3 text-sm text-cyan-50">
+          <div className={`${ui.alertBase} ${ui.alertInfo}`}>
             {state.message}
           </div>
         ) : null}

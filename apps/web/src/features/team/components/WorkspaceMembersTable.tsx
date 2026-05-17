@@ -42,7 +42,7 @@ export function WorkspaceMembersTable({ portal, workspaceId, members }: Workspac
         </thead>
         <tbody>
           {members.map((member) => (
-            <tr className="border-t border-white/10" key={member.id}>
+            <tr className="border-t border-[color:var(--border)]" key={member.id}>
               <td className="px-4 py-3">{member.user?.name ?? `User #${member.user_id}`}</td>
               <td className="px-4 py-3">{member.user?.email ?? "-"}</td>
               <td className="px-4 py-3 capitalize">{member.role}</td>
@@ -54,7 +54,7 @@ export function WorkspaceMembersTable({ portal, workspaceId, members }: Workspac
                       <input name="workspace_id" type="hidden" value={workspaceId} />
                       <input name="member_id" type="hidden" value={member.id} />
                       <select
-                        className="rounded-lg border border-white/10 bg-white/[0.06] px-2 py-1 text-xs text-white outline-none transition focus:border-cyan-300/50 focus:ring-2 focus:ring-cyan-300/20"
+                        className="field-base !w-auto h-8 rounded-full px-3 py-1 text-xs"
                         defaultValue={member.role}
                         name="role"
                       >
@@ -62,7 +62,7 @@ export function WorkspaceMembersTable({ portal, workspaceId, members }: Workspac
                         <option value="agent">Agent</option>
                         <option value="viewer">Viewer</option>
                       </select>
-                      <button className="rounded-lg border border-cyan-300/30 px-2 py-1 text-xs" type="submit">
+                      <button className={ui.actionChip} type="submit">
                         Update
                       </button>
                     </form>
@@ -71,7 +71,7 @@ export function WorkspaceMembersTable({ portal, workspaceId, members }: Workspac
                       <input name="portal" type="hidden" value={portal} />
                       <input name="workspace_id" type="hidden" value={workspaceId} />
                       <input name="member_id" type="hidden" value={member.id} />
-                      <button className="rounded-lg border border-rose-300/30 px-2 py-1 text-xs" type="submit">
+                      <button className={ui.actionChipDanger} type="submit">
                         Remove
                       </button>
                     </form>

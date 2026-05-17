@@ -170,12 +170,12 @@ export async function PortalPolicyListPage({ portal, params }: PortalPolicyListP
         {activePolicies.data.length > 0 ? (
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             {activePolicies.data.map((policy) => (
-              <article className="panel-muted p-4" key={policy.id}>
+              <article className="panel-muted" key={policy.id}>
                 <p className="text-sm font-semibold text-white">{policy.title}</p>
                 <p className="text-muted mt-2 line-clamp-4 text-sm leading-6">{policy.content_text}</p>
                 {portal === "admin" && canManagePolicies ? (
                   <Link
-                    className="mt-4 inline-flex rounded-lg border border-white/15 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:border-cyan-300/30 hover:bg-cyan-300/10"
+                    className={`mt-4 ${ui.actionChip}`}
                     href={`/admin/workspaces/${workspaceId}/policies/${policy.id}`}
                   >
                     Open editor
@@ -193,12 +193,12 @@ export async function PortalPolicyListPage({ portal, params }: PortalPolicyListP
           </div>
         )}
 
-        <div className="mt-8 border-t border-white/10 pt-5">
+        <div className="mt-8 border-t border-[color:var(--border)] pt-5">
           <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-300">Archived policies</p>
           {archivedPolicies.data.length > 0 ? (
             <ul className="mt-3 space-y-2 text-sm text-slate-300">
               {archivedPolicies.data.map((policy) => (
-                <li className="rounded-xl border border-white/10 bg-slate-950/50 px-4 py-3" key={policy.id}>
+                <li className="rounded-[var(--radius-md)] border border-[color:var(--border)] bg-[color:var(--card)] px-4 py-3" key={policy.id}>
                   {policy.title}
                 </li>
               ))}
