@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { RiShieldCheckLine, RiShieldUserLine, RiTeamLine } from "react-icons/ri";
 import { FeatureCard } from "@/components/ui/feature-card";
+import { Footer } from "@/components/ui/footer";
 import { ui } from "@/components/ui/styles";
 
 type AuthShellProps = {
@@ -12,8 +13,8 @@ type AuthShellProps = {
 
 export function AuthShell({ children, description, eyebrow, title }: AuthShellProps) {
   return (
-    <main className="min-h-screen overflow-hidden app-bg px-5 py-7 text-white sm:px-8 sm:py-8 lg:px-14 lg:py-10">
-      <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-[var(--container-wide)] flex-col">
+    <main className="flex min-h-screen flex-col overflow-hidden app-bg px-3 py-5 text-white sm:px-8 sm:py-8 lg:px-14 lg:py-10">
+      <div className="mx-auto flex max-w-[var(--container-wide)] flex-col">
         <nav className="flex items-center justify-between">
           <Link className="text-sm font-bold tracking-[0.2em] text-cyan-100" href="/">
             SUPPORTFLOW
@@ -61,6 +62,7 @@ export function AuthShell({ children, description, eyebrow, title }: AuthShellPr
           </div>
         </section>
       </div>
+      <Footer />
     </main>
   );
 }

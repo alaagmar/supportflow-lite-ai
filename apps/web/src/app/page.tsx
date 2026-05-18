@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { RiFlashlightLine, RiLineChartLine, RiShieldStarLine } from "react-icons/ri";
 import { FeatureCard } from "@/components/ui/feature-card";
+import { Footer } from "@/components/ui/footer";
 import { ui } from "@/components/ui/styles";
 
 export default function Home() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 
   return (
-    <main className="min-h-screen overflow-hidden app-bg px-5 py-7 text-white sm:px-8 sm:py-8 lg:px-14 lg:py-10">
+    <main className="flex min-h-screen flex-col overflow-hidden app-bg px-5 py-7 text-white sm:px-8 sm:py-8 lg:px-14 lg:py-10">
       <section className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-[var(--container-wide)] flex-col">
         <nav className="flex items-center justify-between">
           <div className="text-lg font-bold tracking-[0.12em] text-cyan-100">SUPPORTFLOW</div>
@@ -96,6 +97,9 @@ export default function Home() {
           />
         </div>
       </section>
+      <br />
+      <br />
+      <Footer />
     </main>
   );
 }
