@@ -9,7 +9,7 @@ type FormSectionProps = {
 
 export function FormSection({ eyebrow, title, description, children }: FormSectionProps) {
   return (
-    <section className="rounded-[1.25rem] border border-white/12 bg-slate-950/55 p-5">
+    <section className="rounded-[var(--radius-lg)] border border-[color:var(--border)] bg-[color:var(--card)] p-5 shadow-[var(--shadow-soft)]">
       {eyebrow ? <p className="kicker">{eyebrow}</p> : null}
       <h2 className="mt-2 text-xl font-semibold text-white">{title}</h2>
       {description ? <p className="text-muted mt-2 text-sm leading-6">{description}</p> : null}

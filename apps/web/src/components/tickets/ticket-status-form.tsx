@@ -21,8 +21,8 @@ export function TicketStatusForm({ portal, workspaceId, ticketId, currentStatus 
   const router = useRouter();
   const [state, formAction] = useActionState(updatePortalTicketStatusAction, initialState);
   const alertTone = state.errors
-    ? "border-rose-300/20 bg-rose-400/10 text-rose-100"
-    : "border-emerald-300/20 bg-emerald-300/10 text-emerald-50";
+    ? ui.alertError
+    : ui.alertSuccess;
 
   useEffect(() => {
     if (state.message && !state.errors) {
@@ -42,7 +42,7 @@ export function TicketStatusForm({ portal, workspaceId, ticketId, currentStatus 
         title="Update status"
       >
         {state.message ? (
-          <div className={`rounded-2xl border px-4 py-3 text-sm ${alertTone}`}>{state.message}</div>
+          <div className={`${ui.alertBase} ${alertTone}`}>{state.message}</div>
         ) : null}
 
         <label className="block">

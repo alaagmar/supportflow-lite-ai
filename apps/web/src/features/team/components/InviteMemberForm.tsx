@@ -25,7 +25,7 @@ export function InviteMemberForm({ portal, workspaceId }: InviteMemberFormProps)
 
       <FormSection eyebrow="Team action" title="Invite member">
         {state.message ? (
-          <div className="rounded-xl border border-rose-300/20 bg-rose-400/10 px-3 py-2 text-sm text-rose-100">
+          <div className={`${ui.alertBase} ${ui.alertError}`}>
             {state.message}
           </div>
         ) : null}

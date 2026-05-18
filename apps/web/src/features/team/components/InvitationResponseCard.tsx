@@ -12,7 +12,7 @@ type InvitationResponseCardProps = {
 
 export function InvitationResponseCard({ workspaceId, invitation }: InvitationResponseCardProps) {
   return (
-    <article className="panel-muted p-4">
+    <article className="panel-muted">
       <h2 className="text-lg font-semibold text-white">{invitation.invited_email}</h2>
       <p className="text-muted mt-1 text-sm">Role: {invitation.invited_role}</p>
       <p className="text-muted mt-1 text-sm">Status: {invitation.status}</p>

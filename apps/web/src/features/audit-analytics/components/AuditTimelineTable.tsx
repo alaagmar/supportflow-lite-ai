@@ -30,7 +30,7 @@ export function AuditTimelineTable({ entries }: AuditTimelineTableProps) {
         </thead>
         <tbody>
           {entries.map((entry) => (
-            <tr className="border-b border-white/5" key={entry.id}>
+            <tr className="border-b border-[color:var(--border)]" key={entry.id}>
               <td className="px-4 py-3 text-slate-300">{formatDate(entry.created_at)}</td>
               <td className="px-4 py-3 font-medium text-white">{entry.action}</td>
               <td className="px-4 py-3 text-slate-300">{entry.actor ? `${entry.actor.name} (${entry.actor.email})` : "System"}</td>

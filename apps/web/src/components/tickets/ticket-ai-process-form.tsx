@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { processPortalTicketAiAction, type FormState } from "@/app/actions";
 import { FormSection } from "@/components/ui/form-section";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { ui } from "@/components/ui/styles";
 import type { PortalSlug, TicketStatus } from "@/lib/api";
 
 type TicketAiProcessFormProps = {
@@ -26,8 +27,8 @@ export function TicketAiProcessForm({
   const [state, formAction] = useActionState(processPortalTicketAiAction, initialState);
   const isProcessing = ticketStatus === "processing";
   const alertTone = state.errors
-    ? "border-rose-300/20 bg-rose-400/10 text-rose-100"
-    : "border-emerald-300/20 bg-emerald-300/10 text-emerald-50";
+    ? ui.alertError
+    : ui.alertSuccess;
 
   useEffect(() => {
     if (state.message && !state.errors) {
@@ -47,11 +48,11 @@ export function TicketAiProcessForm({
         title="Run AI triage"
       >
         {state.message ? (
-          <div className={`rounded-2xl border px-4 py-3 text-sm ${alertTone}`}>{state.message}</div>
+          <div className={`${ui.alertBase} ${alertTone}`}>{state.message}</div>
         ) : null}
 
         {isProcessing ? (
-          <p className="rounded-2xl border border-cyan-300/20 bg-cyan-300/10 px-4 py-3 text-sm text-cyan-100">
+          <p className={`${ui.alertBase} ${ui.alertInfo}`}>
             AI processing is already running for this ticket.
           </p>
         ) : null}
